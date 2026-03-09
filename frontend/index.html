@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AutoDamage AI — Car Damage Estimator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --dark:    #111111;
+      --panel:   #1a1a1a;
+      --border:  #2a2a2a;
+      --accent:  #e8ff00;
+      --red:     #ff3b3b;
+      --orange:  #ff8c00;
+      --white:   #f0f0f0;
+      --muted:   #666666;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated GRID background*/
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.3;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .logo-main {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+    }
+
+    .logo-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      background: rgba(232,255,0,0.1);
+      border: 1px solid rgba(232,255,0,0.3);
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      letter-spacing: 0.1em;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #00ff88;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero {
+      position: relative;
+      z-index: 10;
+      padding: 5rem 3rem 3rem;
+      max-width: 900px;
+    }
+
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 8vw, 7rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+      display: block;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .main {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 3rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 1400px;
+    }
+
+    .upload-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .panel-num {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--border);
+    }
+
+    .upload-zone {
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 320px;
+      border: 2px dashed transparent;
+      margin: 1.5rem;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(232,255,0,0.03);
+    }
+
+    .upload-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1.5rem;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+
+    .upload-zone:hover .upload-icon { opacity: 0.8; }
+
+    .upload-text {
+      font-size: 1rem;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .upload-sub {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .upload-btn {
+      margin-top: 2rem;
+      padding: 0.8rem 2rem;
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .upload-btn:hover {
+      background: var(--white);
+      transform: translateY(-1px);
+    }
+
+    #file-input { display: none; }
+
+    .preview-container {
+      margin: 1.5rem;
+      border-radius: 4px;
+      overflow: hidden;
+      display: none;
+      position: relative;
+    }
+
+    .preview-container img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .preview-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .preview-filename {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--white);
+    }
+
+    .analyze-btn {
+      padding: 0.6rem 1.5rem;
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .analyze-btn:hover { background: var(--white); }
+
+    .analyze-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      min-height: 200px;
+      gap: 1.5rem;
+    }
+
+    .loading-bar {
+      width: 200px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: loading 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loading {
+      0%   { width: 0%; margin-left: 0; }
+      50%  { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+
+    .loading-text {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .results-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      gap: 1rem;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      opacity: 0.2;
+    }
+
+    .empty-text {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .cost-summary {
+      display: none;
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(232,255,0,0.03);
+    }
+
+    .cost-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .cost-amount {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .cost-range {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .severity-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.3rem 0.8rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      font-weight: 500;
+    }
+
+    .severity-minor    { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+    .severity-moderate { background: rgba(255,140,0,0.15); color: var(--orange); border: 1px solid rgba(255,140,0,0.3); }
+    .severity-severe   { background: rgba(255,59,59,0.15);  color: var(--red);    border: 1px solid rgba(255,59,59,0.3); }
+    .severity-none     { background: rgba(102,102,102,0.15); color: var(--muted); border: 1px solid rgba(102,102,102,0.3); }
+
+    .damage-list {
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    .damage-item {
+      padding: 1.2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+      align-items: start;
+      animation: slideIn 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .damage-item:last-child { border-bottom: none; }
+
+    .damage-type {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .damage-part {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: 0.2rem;
+    }
+
+    .damage-meta {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-repair  { background: rgba(0,255,136,0.1);  color: #00ff88;      border: 1px solid rgba(0,255,136,0.2); }
+    .tag-replace { background: rgba(255,59,59,0.1);  color: var(--red);   border: 1px solid rgba(255,59,59,0.2); }
+    .tag-conf    { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+    .damage-cost {
+      text-align: right;
+    }
+
+    .cost-min-max {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    .cost-pkr {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .error-state {
+      display: none;
+      padding: 2rem;
+      margin: 1.5rem;
+      border: 1px solid rgba(255,59,59,0.3);
+      background: rgba(255,59,59,0.05);
+      border-radius: 4px;
+    }
+
+    .error-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--red);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-msg {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .stats-bar {
+      display: none;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: none;
+      gap: 2rem;
+      background: var(--dark);
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--white);
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .no-damage {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      gap: 1rem;
+    }
+
+    .no-damage-icon { font-size: 3rem; }
+
+    .no-damage-text {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: #00ff88;
+      letter-spacing: 0.1em;
+    }
+
+    .no-damage-sub {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-left {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .footer-models {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .model-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 0.3rem 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: var(--muted);
+    }
+
+    .model-tag span {
+      color: var(--accent);
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; padding: 1rem; }
+      header { padding: 1.5rem; }
+      .hero  { padding: 3rem 1.5rem 2rem; }
+      footer { flex-direction: column; gap: 1rem; padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <span class="logo-main">AUTODAMAGE</span>
+      <span class="logo-tag">AI v1.0</span>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      SYSTEM ONLINE
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-label">// Intelligent Damage Assessment</div>
+    <h1>DETECT.<br><span>ESTIMATE.</span>REPAIR.</h1>
+    <p>Upload a car image to instantly detect damage, identify affected parts, and get a repair cost estimate in PKR.</p>
+  </section>
+
+  <main class="main">
+
+    <div class="upload-panel">
+      <div class="panel-header">
+        <span class="panel-title">// Image Input</span>
+        <span class="panel-num">01</span>
+      </div>
+
+      <div class="upload-zone" id="upload-zone">
+        <svg class="upload-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="16" width="48" height="36" rx="2" stroke="#e8ff00" stroke-width="2"/>
+          <circle cx="22" cy="28" r="5" stroke="#e8ff00" stroke-width="2"/>
+          <path d="M8 40l14-10 10 8 10-12 14 14" stroke="#e8ff00" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+        <div class="upload-text">Drop your car image here</div>
+        <div class="upload-sub">JPG · PNG · WEBP · MAX 10MB</div>
+        <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+          SELECT IMAGE
+        </button>
+        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp"/>
+      </div>
+
+      <div class="preview-container" id="preview-container">
+        <img id="preview-img" src="" alt="Preview"/>
+        <div class="preview-overlay">
+          <span class="preview-filename" id="preview-filename"></span>
+          <button class="analyze-btn" id="analyze-btn" onclick="analyzeImage()">
+            ANALYZE →
+          </button>
+        </div>
+      </div>
+
+      <div class="loading-state" id="loading-state">
+        <div class="loading-text">ANALYZING DAMAGE...</div>
+        <div class="loading-bar">
+          <div class="loading-fill"></div>
+        </div>
+        <div class="loading-text" style="font-size:0.65rem; color: var(--muted); animation: none;">
+          Running YOLOv11 segmentation models
+        </div>
+      </div>
+
+    </div>
+
+    <div class="results-panel" id="results-panel">
+      <div class="panel-header">
+        <span class="panel-title">// Damage Report</span>
+        <span class="panel-num">02</span>
+      </div>
+
+      <div class="empty-state" id="empty-state">
+        <div class="empty-icon">◎</div>
+        <div class="empty-text">Awaiting image input</div>
+      </div>
+
+      <div class="error-state" id="error-state">
+        <div class="error-title">⚠ Analysis Failed</div>
+        <div class="error-msg" id="error-msg"></div>
+      </div>
+
+      <div class="no-damage" id="no-damage">
+        <div class="no-damage-icon">✓</div>
+        <div class="no-damage-text">NO DAMAGE DETECTED</div>
+        <div class="no-damage-sub">Vehicle appears to be in good condition</div>
+      </div>
+
+      <div class="cost-summary" id="cost-summary">
+        <div class="cost-label">// Total Repair Estimate</div>
+        <div class="cost-amount" id="cost-amount">PKR 0</div>
+        <div class="cost-range" id="cost-range"></div>
+        <div id="severity-badge"></div>
+      </div>
+
+      <div class="damage-list" id="damage-list"></div>
+
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat">
+          <span class="stat-value" id="stat-damages">0</span>
+          <span class="stat-label">Damages Found</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-parts">0</span>
+          <span class="stat-label">Parts Affected</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="stat-action">—</span>
+          <span class="stat-label">Primary Action</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-left">
+      AutoDamage AI · Final Year Project · 2024
+    </div>
+    <div class="footer-models">
+      <div class="model-tag">Parts Model <span>94.47% mAP</span></div>
+      <div class="model-tag">Damage Model <span>76.3% mAP</span></div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
