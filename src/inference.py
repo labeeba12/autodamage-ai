@@ -4,7 +4,10 @@ from src.detection.segmenter import CarSegmenter
 from src.logic.overlap_engine import find_damage_on_parts
 from src.logic.severity_calc import calculate_severity, get_overall_severity
 from src.cost.decision_engine import process_damage_costs, calculate_total_cost
+from src.utils.visualizer import create_before_after
 from config import CURRENCY
+import os
+import uuid
 
 logger = get_logger(__name__)
 
@@ -106,9 +109,27 @@ def run_pipeline(image_path: str) -> dict:
         f"{total_cost['total_max']:,}"
     )
 
-    # STEP 6: Build Clean Output Report
-    # Remove numpy masks from output
-    # (not JSON serializable)
+    # STEP 6: Generate Before/After Image
+    os.makedirs("temp_outputs", exist_ok=True)
+    output_filename = f"result_{uuid.uuid4().hex[:8]}.jpg"
+    output_path     = os.path.join("temp_outputs", output_filename)
+
+    try:
+        create_before_after(
+            original_path    = image_path,
+            matched_results  = processed_results,
+            total_min        = total_cost["total_min"],
+            total_max        = total_cost["total_max"],
+            overall_severity = overall_severity,
+            output_path      = output_path
+        )
+        logger.info(f"Before/after image saved: {output_path}")
+    except Exception as e:
+        logger.warning(f"Could not generate before/after image: {e}")
+        output_path = None
+
+    # STEP 7: Build Clean Output Report
+    # Remove numpy masks from output (not JSON serializable)
     damages_output = []
     for item in processed_results:
         damages_output.append({
@@ -127,11 +148,12 @@ def run_pipeline(image_path: str) -> dict:
     logger.info("Pipeline completed successfully")
 
     return {
-        "success":          True,
-        "total_min":        total_cost["total_min"],
-        "total_max":        total_cost["total_max"],
-        "currency":         CURRENCY,
-        "overall_severity": overall_severity,
-        "total_damages":    len(damages_output),
-        "damages":          damages_output
+        "success":            True,
+        "total_min":          total_cost["total_min"],
+        "total_max":          total_cost["total_max"],
+        "currency":           CURRENCY,
+        "overall_severity":   overall_severity,
+        "total_damages":      len(damages_output),
+        "damages":            damages_output,
+        "result_image_path":  output_path
     }

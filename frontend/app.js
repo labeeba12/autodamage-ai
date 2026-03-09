@@ -143,6 +143,16 @@ function renderResults(data) {
     damageList.appendChild(item);
   });
 
+  // Before/After image
+  if (data.result_image_path) {
+    const filename  = data.result_image_path.split("/").pop();
+    const imgUrl    = `${API_URL}/result-image/${filename}`;
+    const container = document.getElementById("before-after-container");
+    const img       = document.getElementById("before-after-img");
+    img.src         = imgUrl;
+    container.style.display = "block";
+  }
+
   // Stats bar
   const statsBar = document.getElementById("stats-bar");
   statsBar.style.display = "flex";

@@ -27,7 +27,8 @@ class EstimationResponse(BaseModel):
     overall_severity: str           # worst damage severity
     total_damages:    int           # number of damages found
     damages:          List[DamageItem]  # list of individual damages
-    message:          Optional[str] = None  # optional info message
+    message:           Optional[str] = None
+    result_image_path: Optional[str] = None
 
 
 # ERROR RESPONSE

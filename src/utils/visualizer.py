@@ -168,3 +168,121 @@ def draw_summary_bar(
     logger.info(f"Summary bar added: {output_path}")
 
     return output_path
+
+
+def create_before_after(
+    original_path:   str,
+    matched_results: list[dict],
+    total_min:       int,
+    total_max:       int,
+    overall_severity:str,
+    output_path:     str
+) -> str:
+    """
+    Creates a side-by-side before/after comparison image.
+    Left  = original clean image
+    Right = annotated image with damage masks and costs
+    """
+    # Load original
+    original = cv2.imread(original_path)
+    if original is None:
+        raise ValueError(f"Could not load image: {original_path}")
+
+    h, w = original.shape[:2]
+
+    # CREATE ANNOTATED VERSION
+    annotated = original.copy()
+    overlay   = annotated.copy()
+
+    for item in matched_results:
+        damage_type = item["damage_type"]
+        part_name   = item["part_name"]
+        severity    = item.get("severity_label", "unknown")
+        min_cost    = item.get("min_cost", 0)
+        max_cost    = item.get("max_cost", 0)
+        mask        = item.get("damage_mask")
+
+        color = DAMAGE_COLORS.get(damage_type.lower(), DAMAGE_COLORS["unknown"])
+
+        if mask is not None:
+            if mask.shape != (h, w):
+                mask = cv2.resize(
+                    mask.astype(np.uint8),
+                    (w, h),
+                    interpolation=cv2.INTER_NEAREST
+                ).astype(bool)
+
+            overlay[mask] = color
+
+            ys, xs = np.where(mask)
+            if len(xs) > 0 and len(ys) > 0:
+                cx = int(np.mean(xs))
+                cy = int(np.mean(ys))
+
+                label = f"{damage_type} | {part_name}"
+                cost  = f"PKR {min_cost:,}-{max_cost:,}"
+
+                (lw, lh), _ = cv2.getTextSize(
+                    label, FONT, FONT_SCALE, FONT_THICKNESS
+                )
+                cv2.rectangle(
+                    overlay,
+                    (cx - 5, cy - lh - 10),
+                    (cx + lw + 5, cy + 5),
+                    (0, 0, 0), -1
+                )
+                cv2.putText(
+                    overlay, label,
+                    (cx, cy - 5),
+                    FONT, FONT_SCALE, color, FONT_THICKNESS
+                )
+                cv2.putText(
+                    overlay, cost,
+                    (cx, cy + 20),
+                    FONT, 0.5, (255, 255, 255), 1
+                )
+
+    annotated = cv2.addWeighted(overlay, MASK_ALPHA, annotated, 1 - MASK_ALPHA, 0)
+
+    # ADD LABELS ON TOP OF EACH SIDE
+    label_h = 50
+
+    # BEFORE label bar
+    before_bar = np.zeros((label_h, w, 3), dtype=np.uint8)
+    cv2.putText(
+        before_bar, "BEFORE",
+        (20, 35), FONT, 1.0,
+        (200, 200, 200), 2
+    )
+
+    # AFTER label bar
+    after_bar = np.zeros((label_h, w, 3), dtype=np.uint8)
+    severity_color = {
+        "minor":    (0, 255, 136),
+        "moderate": (0, 140, 255),
+        "severe":   (0, 59, 255),
+    }.get(overall_severity, (200, 200, 200))
+
+    cv2.putText(
+        after_bar,
+        f"AFTER  |  {overall_severity.upper()}  |  PKR {total_min:,} - {total_max:,}",
+        (20, 35), FONT, 0.7,
+        severity_color, 2
+    )
+
+    # Stack label + image for each side
+    before_col = np.vstack([before_bar, original])
+    after_col  = np.vstack([after_bar,  annotated])
+
+    # COMBINE SIDE BY SIDE
+    # Add a thin divider line between the two
+    divider    = np.zeros((before_col.shape[0], 4, 3), dtype=np.uint8)
+    divider[:] = (50, 50, 50)
+
+    combined = np.hstack([before_col, divider, after_col])
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    cv2.imwrite(output_path, combined)
+    logger.info(f"Before/after comparison saved: {output_path}")
+
+    return output_path

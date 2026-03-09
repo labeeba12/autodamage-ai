@@ -3,7 +3,8 @@ import shutil
 import uuid
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
 
 from api.schemas import EstimationResponse, ErrorResponse, HealthResponse
 from src.inference import run_pipeline
@@ -124,6 +125,28 @@ async def estimate_damage(file: UploadFile = File(...)):
         if os.path.exists(temp_path):
             os.remove(temp_path)
             logger.info(f"Temp file deleted: {temp_path}")
+            
+# SERVE RESULT IMAGE
+# GET /result-image/{filename}
+@app.get("/result-image/{filename}")
+async def get_result_image(filename: str, background_tasks: BackgroundTasks):
+    """
+    Returns the before/after comparison image.
+    Automatically deletes file after serving.
+    """
+    file_path = os.path.join("temp_outputs", filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    # Delete file after sending
+    background_tasks.add_task(os.remove, file_path)
+
+    return FileResponse(
+        path         = file_path,
+        media_type   = "image/jpeg",
+        filename     = filename
+    )
 
 
 # RUN SERVER
