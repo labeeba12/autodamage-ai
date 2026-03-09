@@ -1,0 +1,52 @@
+part,damage_type,min_price,max_price,repair_or_replace
+Front-bumper,scratch,5000,15000,repair
+Front-bumper,dent,8000,25000,repair
+Front-bumper,crack,12000,30000,repair
+Front-bumper,glass shatter,20000,50000,replace
+Front-bumper,lamp broken,15000,35000,replace
+Back-bumper,scratch,5000,15000,repair
+Back-bumper,dent,8000,25000,repair
+Back-bumper,crack,12000,30000,repair
+Hood,scratch,6000,18000,repair
+Hood,dent,10000,30000,repair
+Hood,crack,15000,40000,replace
+Front-door,scratch,6000,18000,repair
+Front-door,dent,12000,35000,repair
+Front-door,crack,15000,40000,replace
+Back-door,scratch,6000,18000,repair
+Back-door,dent,12000,35000,repair
+Back-door,crack,15000,40000,replace
+Windshield,glass shatter,20000,60000,replace
+Windshield,crack,15000,40000,replace
+Front-window,glass shatter,15000,45000,replace
+Front-window,crack,10000,30000,replace
+Back-window,glass shatter,15000,45000,replace
+Back-window,crack,10000,30000,replace
+Back-windshield,glass shatter,18000,55000,replace
+Back-windshield,crack,12000,35000,replace
+Headlight,lamp broken,12000,35000,replace
+Headlight,crack,8000,20000,repair
+Tail-light,lamp broken,10000,30000,replace
+Tail-light,crack,6000,18000,repair
+Mirror,scratch,3000,8000,repair
+Mirror,crack,5000,15000,repair
+Mirror,lamp broken,8000,20000,replace
+Fender,scratch,5000,15000,repair
+Fender,dent,8000,25000,repair
+Fender,crack,12000,30000,replace
+Roof,scratch,6000,18000,repair
+Roof,dent,15000,45000,repair
+Roof,crack,20000,50000,replace
+Trunk,scratch,5000,15000,repair
+Trunk,dent,10000,30000,repair
+Trunk,crack,12000,35000,replace
+Front-wheel,tire flat,5000,15000,replace
+Back-wheel,tire flat,5000,15000,replace
+Quarter-panel,scratch,6000,18000,repair
+Quarter-panel,dent,10000,30000,repair
+Rocker-panel,scratch,5000,15000,repair
+Rocker-panel,dent,8000,25000,repair
+Grille,crack,8000,20000,repair
+Grille,scratch,4000,12000,repair
+License-plate,scratch,1000,5000,repair
+License-plate,crack,2000,8000,replace

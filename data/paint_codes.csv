@@ -1,0 +1,6 @@
+paint_code,paint_type,min_price,max_price
+solid,Solid Color,3000,8000
+metallic,Metallic,5000,12000
+pearl,Pearl/Nacreous,8000,18000
+matte,Matte Finish,10000,25000
+candy,Candy/Special,15000,35000
