@@ -29,6 +29,11 @@ class EstimationResponse(BaseModel):
     damages:          List[DamageItem]  # list of individual damages
     message:           Optional[str] = None
     result_image_path: Optional[str] = None
+    paint_color:       Optional[str] = None
+    paint_code:        Optional[str] = None
+    paint_hex:         Optional[str] = None
+    paint_cost_min:    Optional[int] = None
+    paint_cost_max:    Optional[int] = None
 
 
 # ERROR RESPONSE

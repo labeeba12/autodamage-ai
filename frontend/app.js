@@ -143,6 +143,20 @@ function renderResults(data) {
     damageList.appendChild(item);
   });
 
+  // Paint color info
+  if (data.paint_color) {
+    const paintContainer = document.getElementById("paint-container");
+    const paintDot       = document.getElementById("paint-dot");
+    const paintName      = document.getElementById("paint-name");
+    const paintCost      = document.getElementById("paint-cost");
+
+    paintDot.style.background = data.paint_hex || "#ccc";
+    paintName.textContent      = `${data.paint_color} (${data.paint_code})`;
+    paintCost.textContent      =
+      `Paint cost: PKR ${data.paint_cost_min?.toLocaleString()} – ${data.paint_cost_max?.toLocaleString()}`;
+    paintContainer.style.display = "flex";
+  }
+
   // Before/After image
   if (data.result_image_path) {
     const filename  = data.result_image_path.split("/").pop();

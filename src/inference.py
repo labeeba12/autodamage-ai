@@ -5,14 +5,15 @@ from src.logic.overlap_engine import find_damage_on_parts
 from src.logic.severity_calc import calculate_severity, get_overall_severity
 from src.cost.decision_engine import process_damage_costs, calculate_total_cost
 from src.utils.visualizer import create_before_after
+from src.utils.color_detector import detect_paint_color
+from src.cost.paint_estimator import PaintEstimator
 from config import CURRENCY
 import os
 import uuid
 
 logger = get_logger(__name__)
 
-#   Load models once at startup
-#   (not on every request)
+# Load models once at startup (not on every request)
 segmenter = CarSegmenter()
 
 
@@ -48,6 +49,12 @@ def run_pipeline(image_path: str) -> dict:
     """
 
     logger.info(f"Pipeline started for: {image_path}")
+    
+    # DETECT PAINT COLOR
+    paint_info     = detect_paint_color(image_path)
+    paint_estimator = PaintEstimator()
+    paint_cost     = paint_estimator.get_paint_cost(paint_info["paint_code"])
+    logger.info(f"Paint detected: {paint_info['color_name']} → {paint_info['paint_code']}")
 
     # STEP 1: Validate Image
     is_valid, message = validate_image(image_path)
@@ -155,5 +162,10 @@ def run_pipeline(image_path: str) -> dict:
         "overall_severity":   overall_severity,
         "total_damages":      len(damages_output),
         "damages":            damages_output,
-        "result_image_path":  output_path
+        "result_image_path":  output_path,
+        "paint_color":        paint_info["color_name"],
+        "paint_code":         paint_info["paint_code"],
+        "paint_hex":          paint_info["hex_color"],
+        "paint_cost_min":     paint_cost["min_price"],
+        "paint_cost_max":     paint_cost["max_price"],
     }
