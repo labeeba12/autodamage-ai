@@ -6,6 +6,7 @@ from src.logic.severity_calc import calculate_severity, get_overall_severity
 from src.cost.decision_engine import process_damage_costs, calculate_total_cost
 from src.utils.visualizer import create_before_after
 from src.utils.color_detector import detect_paint_color
+from src.utils.heatmap_generator import generate_heatmap
 from src.cost.paint_estimator import PaintEstimator
 from config import CURRENCY
 import os
@@ -134,8 +135,22 @@ def run_pipeline(image_path: str) -> dict:
     except Exception as e:
         logger.warning(f"Could not generate before/after image: {e}")
         output_path = None
+        
+    # STEP 7: Generate Heatmap
+    heatmap_filename = f"heatmap_{uuid.uuid4().hex[:8]}.jpg"
+    heatmap_path     = os.path.join("temp_outputs", heatmap_filename)
 
-    # STEP 7: Build Clean Output Report
+    try:
+        generate_heatmap(
+            matched_results = processed_results,
+            output_path     = heatmap_path
+        )
+        logger.info(f"Heatmap saved: {heatmap_path}")
+    except Exception as e:
+        logger.warning(f"Could not generate heatmap: {e}")
+        heatmap_path = None
+
+    # STEP 8: Build Clean Output Report
     # Remove numpy masks from output (not JSON serializable)
     damages_output = []
     for item in processed_results:
@@ -168,4 +183,5 @@ def run_pipeline(image_path: str) -> dict:
         "paint_hex":          paint_info["hex_color"],
         "paint_cost_min":     paint_cost["min_price"],
         "paint_cost_max":     paint_cost["max_price"],
+        "heatmap_path":       heatmap_path,
     }

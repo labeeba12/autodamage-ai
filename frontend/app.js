@@ -157,6 +157,16 @@ function renderResults(data) {
     paintContainer.style.display = "flex";
   }
 
+  // Heatmap
+  if (data.heatmap_path) {
+    const filename        = data.heatmap_path.split("/").pop();
+    const heatmapUrl      = `${API_URL}/heatmap/${filename}`;
+    const heatmapContainer= document.getElementById("heatmap-container");
+    const heatmapImg      = document.getElementById("heatmap-img");
+    heatmapImg.src        = heatmapUrl;
+    heatmapContainer.style.display = "block";
+  }
+
   // Before/After image
   if (data.result_image_path) {
     const filename  = data.result_image_path.split("/").pop();

@@ -147,6 +147,24 @@ async def get_result_image(filename: str, background_tasks: BackgroundTasks):
         media_type   = "image/jpeg",
         filename     = filename
     )
+    
+# SERVE HEATMAP IMAGE
+# GET /heatmap/{filename}
+@app.get("/heatmap/{filename}")
+async def get_heatmap(filename: str, background_tasks: BackgroundTasks):
+    """Returns the damage heatmap image."""
+    file_path = os.path.join("temp_outputs", filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Heatmap not found")
+
+    background_tasks.add_task(os.remove, file_path)
+
+    return FileResponse(
+        path       = file_path,
+        media_type = "image/jpeg",
+        filename   = filename
+    )
 
 
 # RUN SERVER
