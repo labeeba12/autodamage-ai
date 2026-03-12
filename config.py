@@ -8,6 +8,7 @@ load_dotenv()
 PARTS_MODEL_PATH  = os.getenv("PARTS_MODEL_PATH",  "models/car_parts_seg.pt")
 DAMAGE_MODEL_PATH = os.getenv("DAMAGE_MODEL_PATH", "models/car_damage_seg.pt")
 XGBOOST_MODEL_PATH = os.getenv("XGBOOST_MODEL_PATH", "models/xgboost_cost_model.json")
+CLASSIFIER_MODEL_PATH = os.getenv("CLASSIFIER_MODEL_PATH", "models/car_classifier.pt")
 
 # DATA PATHS
 BASELINE_PRICES_PATH = "data/baseline_prices.csv"

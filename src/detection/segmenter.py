@@ -5,6 +5,7 @@ from src.utils.logger import get_logger
 from config import (
     PARTS_MODEL_PATH,
     DAMAGE_MODEL_PATH,
+    CLASSIFIER_MODEL_PATH,
     CONFIDENCE_THRESH,
     IMAGE_SIZE,
     MIN_SEGMENT_AREA
@@ -15,21 +16,23 @@ logger = get_logger(__name__)
 
 class CarSegmenter:
     """
-    Loads both YOLO models once and reuses them for every request.
+    Loads all three YOLO models once and reuses them for every request.
     Loading models is expensive — we do it once at startup.
     """
 
     def __init__(self):
         logger.info("Loading car parts segmentation model...")
-        self.parts_model  = YOLO(PARTS_MODEL_PATH)
+        self.parts_model      = YOLO(PARTS_MODEL_PATH)
         logger.info("Loading car damage segmentation model...")
-        self.damage_model = YOLO(DAMAGE_MODEL_PATH)
-        logger.info("Both models loaded successfully!")
+        self.damage_model     = YOLO(DAMAGE_MODEL_PATH)
+        logger.info("Loading car classifier model...")
+        self.classifier_model = YOLO(CLASSIFIER_MODEL_PATH)
+        logger.info("All three models loaded successfully!")
 
     # INTERNAL HELPER
     def _run_model(self, model: YOLO, image_path: str) -> list[dict]:
         """
-        Runs a single YOLO model on an image.
+        Runs a single YOLO segmentation model on an image.
         Returns a list of detections, each containing:
             - class_id
             - class_name
@@ -39,15 +42,15 @@ class CarSegmenter:
             - area_ratio (mask area / total image area)
         """
         results = model.predict(
-            source=image_path,
-            conf=CONFIDENCE_THRESH,
-            imgsz=IMAGE_SIZE,
-            save=False,
-            verbose=False
+            source  = image_path,
+            conf    = CONFIDENCE_THRESH,
+            imgsz   = IMAGE_SIZE,
+            save    = False,
+            verbose = False
         )
 
         detections = []
-        result = results[0]
+        result     = results[0]
 
         # No detections found
         if result.masks is None:
@@ -89,7 +92,7 @@ class CarSegmenter:
                 "area_ratio": round(area_ratio, 6)
             })
 
-        logger.info(f"{len(detections)} detections found by {model.names[0]} model")
+        logger.info(f"{len(detections)} detections found")
         return detections
 
     # PUBLIC METHODS
@@ -103,11 +106,50 @@ class CarSegmenter:
         logger.info("Running car damage detection...")
         return self._run_model(self.damage_model, image_path)
 
-    def detect_all(self, image_path: str) -> tuple[list[dict], list[dict]]:
+    def classify_car(self, image_path: str) -> dict:
         """
-        Runs both models on the same image.
-        Returns (parts_detections, damage_detections)
+        Runs car classifier model.
+        Returns top 3 predictions with confidence scores.
         """
-        parts  = self.detect_parts(image_path)
-        damage = self.detect_damage(image_path)
-        return parts, damage
+        logger.info("Running car classifier...")
+
+        results = self.classifier_model.predict(
+            source  = image_path,
+            imgsz   = 224,
+            save    = False,
+            verbose = False
+        )
+
+        probs       = results[0].probs
+        class_names = results[0].names
+
+        top3_indices = probs.top5[:3]
+        top3_confs   = probs.top5conf[:3].tolist()
+
+        predictions = [
+            {
+                "rank":       i + 1,
+                "model":      class_names[idx],
+                "confidence": round(float(conf), 4)
+            }
+            for i, (idx, conf) in enumerate(zip(top3_indices, top3_confs))
+        ]
+
+        result = {
+            "predicted_model": class_names[top3_indices[0]],
+            "confidence":      round(float(top3_confs[0]), 4),
+            "top3":            predictions
+        }
+
+        logger.info(f"Car classified as: {result['predicted_model']} ({result['confidence']:.2%})")
+        return result
+
+    def detect_all(self, image_path: str) -> tuple[list[dict], list[dict], dict]:
+        """
+        Runs all three models on the same image.
+        Returns (parts_detections, damage_detections, car_classification)
+        """
+        parts          = self.detect_parts(image_path)
+        damage         = self.detect_damage(image_path)
+        classification = self.classify_car(image_path)
+        return parts, damage, classification

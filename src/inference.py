@@ -68,7 +68,7 @@ def run_pipeline(image_path: str) -> dict:
     logger.info("Step 1 complete — Image validated")
 
     # STEP 2: Run Both YOLO Models
-    parts_detections, damage_detections = segmenter.detect_all(image_path)
+    parts_detections, damage_detections, classification = segmenter.detect_all(image_path)
     logger.info(
         f"Step 2 complete — "
         f"Parts: {len(parts_detections)} | "
@@ -184,4 +184,7 @@ def run_pipeline(image_path: str) -> dict:
         "paint_cost_min":     paint_cost["min_price"],
         "paint_cost_max":     paint_cost["max_price"],
         "heatmap_path":       heatmap_path,
+        "car_model":          classification["predicted_model"],
+        "car_model_confidence": classification["confidence"],
+        "car_model_top3":     classification["top3"],
     }
