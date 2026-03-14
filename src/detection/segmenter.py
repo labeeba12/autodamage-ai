@@ -125,6 +125,13 @@ class CarSegmenter:
 
         top3_indices = probs.top5[:3]
         top3_confs   = probs.top5conf[:3].tolist()
+        
+        predicted_label = class_names[top3_indices[0]]
+        main_confidence = round(float(top3_confs[0]), 4)
+        
+        is_car = True
+        if main_confidence < 0.5 or predicted_label.lower() in ["background", "not_a_car", "person"]:
+            is_car = False
 
         predictions = [
             {
@@ -136,12 +143,13 @@ class CarSegmenter:
         ]
 
         result = {
-            "predicted_model": class_names[top3_indices[0]],
-            "confidence":      round(float(top3_confs[0]), 4),
+            "predicted_model": predicted_label,
+            "confidence":      main_confidence,
+            "is_car":          is_car, 
             "top3":            predictions
         }
 
-        logger.info(f"Car classified as: {result['predicted_model']} ({result['confidence']:.2%})")
+        logger.info(f"Car classified as: {result['predicted_model']} | Is Car: {is_car}")
         return result
 
     def detect_all(self, image_path: str) -> tuple[list[dict], list[dict], dict]:

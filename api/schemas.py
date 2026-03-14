@@ -35,6 +35,9 @@ class EstimationResponse(BaseModel):
     paint_cost_min:    Optional[int] = None
     paint_cost_max:    Optional[int] = None
     heatmap_path:      Optional[str] = None
+    car_model:             Optional[str]  = None
+    car_model_confidence:  Optional[float] = None
+    car_model_top3:        Optional[list] = None
 
 
 # ERROR RESPONSE

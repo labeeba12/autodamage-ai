@@ -2,7 +2,9 @@ const API_URL = "http://localhost:8000";
 
 let selectedFile = null;
 
-// File input handling
+// ─────────────────────────────────────────
+//   FILE INPUT HANDLING
+// ─────────────────────────────────────────
 document.getElementById("file-input").addEventListener("change", function (e) {
   const file = e.target.files[0];
   if (file) handleFileSelected(file);
@@ -27,7 +29,9 @@ uploadZone.addEventListener("drop", (e) => {
   if (file) handleFileSelected(file);
 });
 
-// Handle file selected
+// ─────────────────────────────────────────
+//   HANDLE FILE SELECTED
+// ─────────────────────────────────────────
 function handleFileSelected(file) {
   selectedFile = file;
 
@@ -45,7 +49,9 @@ function handleFileSelected(file) {
   resetResults();
 }
 
-// Analyze Image — calls FastAPI
+// ─────────────────────────────────────────
+//   ANALYZE IMAGE — calls FastAPI
+// ─────────────────────────────────────────
 async function analyzeImage() {
   if (!selectedFile) return;
 
@@ -83,7 +89,9 @@ async function analyzeImage() {
   }
 }
 
-// Render results
+// ─────────────────────────────────────────
+//   RENDER RESULTS
+// ─────────────────────────────────────────
 function renderResults(data) {
   hideAll();
 
@@ -159,7 +167,7 @@ function renderResults(data) {
 
   // Heatmap
   if (data.heatmap_path) {
-    const filename        = data.heatmap_path.split("/").pop();
+    const filename        = data.heatmap_path.split(/[\\/]/).pop();
     const heatmapUrl      = `${API_URL}/heatmap/${filename}`;
     const heatmapContainer= document.getElementById("heatmap-container");
     const heatmapImg      = document.getElementById("heatmap-img");
@@ -169,7 +177,7 @@ function renderResults(data) {
 
   // Before/After image
   if (data.result_image_path) {
-    const filename  = data.result_image_path.split("/").pop();
+    const filename  = data.result_image_path.split(/[\\/]/).pop();
     const imgUrl    = `${API_URL}/result-image/${filename}`;
     const container = document.getElementById("before-after-container");
     const img       = document.getElementById("before-after-img");
@@ -191,7 +199,9 @@ function renderResults(data) {
     replaceCount > data.total_damages / 2 ? "REPLACE" : "REPAIR";
 }
 
-// Show ERROR
+// ─────────────────────────────────────────
+//   SHOW ERROR
+// ─────────────────────────────────────────
 function showError(message) {
   hideAll();
   const errorState = document.getElementById("error-state");
@@ -199,7 +209,9 @@ function showError(message) {
   document.getElementById("error-msg").textContent = message;
 }
 
-// Helpers
+// ─────────────────────────────────────────
+//   HELPERS
+// ─────────────────────────────────────────
 function hideAll() {
   document.getElementById("empty-state").style.display    = "none";
   document.getElementById("error-state").style.display    = "none";

@@ -6,6 +6,7 @@
   <title>AutoDamage AI — Car Damage Estimator</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
+    /* ─── RESET & BASE ─────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -33,7 +34,7 @@
       overflow-x: hidden;
     }
 
-    /* Animated GRID background*/
+    /* ─── ANIMATED GRID BACKGROUND ─────────────────── */
     body::before {
       content: '';
       position: fixed;
@@ -47,6 +48,7 @@
       pointer-events: none;
     }
 
+    /* ─── HEADER ────────────────────────────────────── */
     header {
       position: relative;
       z-index: 10;
@@ -103,6 +105,7 @@
       50%       { opacity: 0.5; transform: scale(0.8); }
     }
 
+    /* ─── HERO ──────────────────────────────────────── */
     .hero {
       position: relative;
       z-index: 10;
@@ -141,6 +144,7 @@
       line-height: 1.6;
     }
 
+    /* ─── MAIN LAYOUT ───────────────────────────────── */
     .main {
       position: relative;
       z-index: 10;
@@ -151,6 +155,7 @@
       max-width: 1400px;
     }
 
+    /* ─── UPLOAD PANEL ──────────────────────────────── */
     .upload-panel {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -246,6 +251,7 @@
 
     #file-input { display: none; }
 
+    /* ─── IMAGE PREVIEW ─────────────────────────────── */
     .preview-container {
       margin: 1.5rem;
       border-radius: 4px;
@@ -299,6 +305,7 @@
       cursor: not-allowed;
     }
 
+    /* ─── LOADING STATE ─────────────────────────────── */
     .loading-state {
       display: none;
       flex-direction: column;
@@ -343,6 +350,7 @@
       50%       { opacity: 0.3; }
     }
 
+    /* ─── RESULTS PANEL ─────────────────────────────── */
     .results-panel {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -375,6 +383,7 @@
       text-transform: uppercase;
     }
 
+    /* ─── COST SUMMARY ──────────────────────────────── */
     .cost-summary {
       display: none;
       padding: 2rem 1.5rem;
@@ -422,6 +431,7 @@
     .severity-severe   { background: rgba(255,59,59,0.15);  color: var(--red);    border: 1px solid rgba(255,59,59,0.3); }
     .severity-none     { background: rgba(102,102,102,0.15); color: var(--muted); border: 1px solid rgba(102,102,102,0.3); }
 
+    /* ─── DAMAGE LIST ───────────────────────────────── */
     .damage-list {
       display: none;
       flex-direction: column;
@@ -500,6 +510,7 @@
       margin-top: 0.2rem;
     }
 
+    /* ─── ERROR STATE ───────────────────────────────── */
     .error-state {
       display: none;
       padding: 2rem;
@@ -523,6 +534,7 @@
       color: var(--muted);
     }
 
+    /* ─── STATS BAR ─────────────────────────────────── */
     .stats-bar {
       display: none;
       padding: 1rem 1.5rem;
@@ -552,6 +564,7 @@
       text-transform: uppercase;
     }
 
+    /* ─── NO DAMAGE ─────────────────────────────────── */
     .no-damage {
       display: none;
       flex-direction: column;
@@ -576,6 +589,7 @@
       color: var(--muted);
     }
 
+    /* ─── FOOTER ────────────────────────────────────── */
     footer {
       position: relative;
       z-index: 10;
@@ -610,6 +624,7 @@
       color: var(--accent);
     }
 
+    /* ─── RESPONSIVE ────────────────────────────────── */
     @media (max-width: 900px) {
       .main { grid-template-columns: 1fr; padding: 1rem; }
       header { padding: 1.5rem; }
@@ -620,6 +635,7 @@
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
     <div class="logo">
       <span class="logo-main">AUTODAMAGE</span>
@@ -631,20 +647,24 @@
     </div>
   </header>
 
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-label">// Intelligent Damage Assessment</div>
     <h1>DETECT.<br><span>ESTIMATE.</span>REPAIR.</h1>
     <p>Upload a car image to instantly detect damage, identify affected parts, and get a repair cost estimate in PKR.</p>
   </section>
 
+  <!-- MAIN -->
   <main class="main">
 
+    <!-- LEFT: UPLOAD PANEL -->
     <div class="upload-panel">
       <div class="panel-header">
         <span class="panel-title">// Image Input</span>
         <span class="panel-num">01</span>
       </div>
 
+      <!-- Upload Zone -->
       <div class="upload-zone" id="upload-zone">
         <svg class="upload-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="8" y="16" width="48" height="36" rx="2" stroke="#e8ff00" stroke-width="2"/>
@@ -659,6 +679,7 @@
         <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp"/>
       </div>
 
+      <!-- Image Preview -->
       <div class="preview-container" id="preview-container">
         <img id="preview-img" src="" alt="Preview"/>
         <div class="preview-overlay">
@@ -669,6 +690,7 @@
         </div>
       </div>
 
+      <!-- Loading -->
       <div class="loading-state" id="loading-state">
         <div class="loading-text">ANALYZING DAMAGE...</div>
         <div class="loading-bar">
@@ -681,28 +703,33 @@
 
     </div>
 
+    <!-- RIGHT: RESULTS PANEL -->
     <div class="results-panel" id="results-panel">
       <div class="panel-header">
         <span class="panel-title">// Damage Report</span>
         <span class="panel-num">02</span>
       </div>
 
+      <!-- Empty State -->
       <div class="empty-state" id="empty-state">
         <div class="empty-icon">◎</div>
         <div class="empty-text">Awaiting image input</div>
       </div>
 
+      <!-- Error State -->
       <div class="error-state" id="error-state">
         <div class="error-title">⚠ Analysis Failed</div>
         <div class="error-msg" id="error-msg"></div>
       </div>
 
+      <!-- No Damage -->
       <div class="no-damage" id="no-damage">
         <div class="no-damage-icon">✓</div>
         <div class="no-damage-text">NO DAMAGE DETECTED</div>
         <div class="no-damage-sub">Vehicle appears to be in good condition</div>
       </div>
 
+      <!-- Cost Summary -->
       <div class="cost-summary" id="cost-summary">
         <div class="cost-label">// Total Repair Estimate</div>
         <div class="cost-amount" id="cost-amount">PKR 0</div>
@@ -710,6 +737,7 @@
         <div id="severity-badge"></div>
       </div>
 
+      <!-- Damage List -->
       <div class="damage-list" id="damage-list"></div>
 
       <!-- Heatmap -->
@@ -736,6 +764,7 @@
           style="width:100%; border-radius:4px; border: 1px solid var(--border);"/>
       </div>
 
+      <!-- Stats Bar -->
       <div class="stats-bar" id="stats-bar">
         <div class="stat">
           <span class="stat-value" id="stat-damages">0</span>
@@ -754,6 +783,7 @@
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer>
     <div class="footer-left">
       AutoDamage AI · Final Year Project · 2024
