@@ -71,20 +71,16 @@ def run_pipeline(image_path: str) -> dict:
     parts_detections, damage_detections, classification = segmenter.detect_all(image_path)
     
     # CAR VALIDATION CHECK
-    no_parts  = len(parts_detections) == 0
-    low_conf  = classification["confidence"] < 0.60
+    no_parts   = len(parts_detections) == 0
+    no_damage  = len(damage_detections) == 0
+    low_conf   = classification["confidence"] < 0.75
+
     if no_parts and low_conf:
-        logger.error(f"Not a car — no parts detected and low classifier confidence: {classification['confidence']:.2%}")
+        logger.error(f"Not a car — no parts detected and low confidence: {classification['confidence']:.2%}")
         return {
             "success": False,
             "error":   "No vehicle detected in image. Please upload a clear car photo."
         }
-        
-        logger.info(
-        f"Step 2 complete — "
-        f"Parts: {len(parts_detections)} | "
-        f"Damage: {len(damage_detections)}"
-    )
 
     # No damage found — return early
     if not damage_detections:

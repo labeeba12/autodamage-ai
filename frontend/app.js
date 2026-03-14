@@ -197,6 +197,9 @@ function renderResults(data) {
   const replaceCount = data.damages.filter(d => d.action === "replace").length;
   document.getElementById("stat-action").textContent =
     replaceCount > data.total_damages / 2 ? "REPLACE" : "REPAIR";
+
+    // Show analyze another button
+  document.getElementById("action-footer").style.display = "block";
 }
 
 // ─────────────────────────────────────────
@@ -219,6 +222,10 @@ function hideAll() {
   document.getElementById("cost-summary").style.display   = "none";
   document.getElementById("damage-list").style.display    = "none";
   document.getElementById("stats-bar").style.display      = "none";
+  document.getElementById("action-footer").style.display  = "none";
+  document.getElementById("heatmap-container").style.display  = "none";
+  document.getElementById("paint-container").style.display    = "none";
+  document.getElementById("before-after-container").style.display = "none";
 }
 
 function resetResults() {
@@ -228,4 +235,12 @@ function resetResults() {
 
 function formatNumber(num) {
   return num.toLocaleString("en-PK");
+}
+
+function startNew() {
+  selectedFile = null;
+  document.getElementById("preview-container").style.display = "none";
+  document.getElementById("upload-zone").style.display = "flex";
+  document.getElementById("file-input").value = "";
+  resetResults();
 }
