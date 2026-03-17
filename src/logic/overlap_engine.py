@@ -39,7 +39,7 @@ def calculate_overlap_ratio(damage_mask: np.ndarray, part_mask: np.ndarray) -> f
 def find_damage_on_parts(
     parts_detections:  list[dict],
     damage_detections: list[dict],
-    overlap_threshold: float = 0.3
+    overlap_threshold: float = 0.1
 ) -> list[dict]:
     """
     Main function — matches each damage to the car part it sits on.
@@ -108,17 +108,49 @@ def find_damage_on_parts(
                 f"(overlap: {best_overlap:.2%})"
             )
 
-        # NO MATCH FOUND
+        # NO MATCH FOUND — use proximity matching as fallback
         else:
+            part_name = "Unknown Part"
+            part_mask = None
+
+            if parts_detections:
+                # Find nearest part by centroid distance
+                dmg_y = np.where(damage["mask"])[0].mean()
+                dmg_x = np.where(damage["mask"])[1].mean()
+
+                nearest_part = None
+                min_distance = float("inf")
+
+                for part in parts_detections:
+                    part_y = np.where(part["mask"])[0].mean()
+                    part_x = np.where(part["mask"])[1].mean()
+                    distance = ((dmg_y - part_y) ** 2 + (dmg_x - part_x) ** 2) ** 0.5
+
+                    if distance < min_distance:
+                        min_distance = distance
+                        nearest_part = part
+
+                if nearest_part:
+                    part_name = nearest_part["class_name"]
+                    part_mask = nearest_part["mask"]
+                    logger.warning(
+                        f"Proximity match: {damage['class_name']} "
+                        f"→ {part_name} (distance: {min_distance:.0f}px)"
+                    )
+                logger.warning(
+                    f"Low overlap match: {damage['class_name']} "
+                    f"ON {part_name} "
+                    f"(overlap: {best_overlap:.2%})"
+                )
             matched_results.append({
                 "damage_type":   damage["class_name"],
-                "part_name":     "Unknown Part",
+                "part_name":     part_name,
                 "confidence":    damage["confidence"],
                 "overlap_ratio": round(best_overlap, 4),
                 "pixel_area":    damage["pixel_area"],
                 "area_ratio":    damage["area_ratio"],
                 "damage_mask":   damage["mask"],
-                "part_mask":     None,
+                "part_mask":     part_mask,
             })
             logger.warning(
                 f"No part match for {damage['class_name']} "

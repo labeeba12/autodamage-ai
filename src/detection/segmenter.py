@@ -59,6 +59,7 @@ class CarSegmenter:
         # Get image dimensions
         img_h, img_w = result.orig_shape
         total_pixels = img_h * img_w
+        logger.info(f"Model: {list(model.names.values())[0]} | orig_shape: {img_h}x{img_w}")
 
         for i, mask in enumerate(result.masks):
             box        = result.boxes[i]

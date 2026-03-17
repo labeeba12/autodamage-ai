@@ -2,9 +2,7 @@ const API_URL = "http://localhost:8000";
  
 let selectedFile = null;
  
-// ─────────────────────────────────────────
-//   FILE INPUT
-// ─────────────────────────────────────────
+// FILE INPUT
 document.getElementById("file-input").addEventListener("change", function (e) {
   const file = e.target.files[0];
   if (file) handleFileSelected(file);
@@ -29,9 +27,7 @@ uploadZone.addEventListener("drop", (e) => {
   if (file) handleFileSelected(file);
 });
  
-// ─────────────────────────────────────────
-//   HANDLE FILE SELECTED
-// ─────────────────────────────────────────
+// HANDLE FILE SELECTED
 function handleFileSelected(file) {
   selectedFile = file;
  
@@ -47,9 +43,7 @@ function handleFileSelected(file) {
   resetResults();
 }
  
-// ─────────────────────────────────────────
-//   ANALYZE IMAGE
-// ─────────────────────────────────────────
+// ANALYZE IMAGE
 async function analyzeImage() {
   if (!selectedFile) return;
  
@@ -85,9 +79,7 @@ async function analyzeImage() {
   }
 }
  
-// ─────────────────────────────────────────
-//   RENDER RESULTS
-// ─────────────────────────────────────────
+// RENDER RESULTS
 function renderResults(data) {
   window._lastReportData = data;
   hideAll();
@@ -164,12 +156,14 @@ function renderResults(data) {
     document.getElementById("paint-container").style.display = "flex";
   }
  
-  // Car model
+  // Car model — show with color-coded confidence
   if (data.car_model) {
     const name = data.car_model.replace(/_/g, " ");
     const conf = Math.round(data.car_model_confidence * 100);
+    const confColor = conf >= 80 ? "#34d399" : conf >= 50 ? "#e3b341" : "#f85149";
     document.getElementById("car-model-name").textContent = name;
     document.getElementById("car-model-conf").textContent = `${conf}% confidence`;
+    document.getElementById("car-model-conf").style.color = confColor;
     document.getElementById("car-model-container").style.display = "flex";
   }
  
@@ -186,18 +180,14 @@ function renderResults(data) {
   document.getElementById("action-footer").style.display = "block";
 }
  
-// ─────────────────────────────────────────
-//   SHOW ERROR
-// ─────────────────────────────────────────
+// SHOW ERROR
 function showError(message) {
   hideAll();
   document.getElementById("error-state").style.display = "block";
   document.getElementById("error-msg").textContent = message;
 }
  
-// ─────────────────────────────────────────
-//   HIDE ALL
-// ─────────────────────────────────────────
+// HIDE ALL
 function hideAll() {
   document.getElementById("empty-state").style.display         = "none";
   document.getElementById("error-state").style.display         = "none";
@@ -214,17 +204,13 @@ function hideAll() {
   document.getElementById("action-footer").style.display       = "none";
 }
  
-// ─────────────────────────────────────────
-//   RESET
-// ─────────────────────────────────────────
+// RESET
 function resetResults() {
   hideAll();
   document.getElementById("empty-state").style.display = "flex";
 }
  
-// ─────────────────────────────────────────
-//   START NEW
-// ─────────────────────────────────────────
+// START NEW
 function startNew() {
   selectedFile = null;
   document.getElementById("preview-container").style.display = "none";
@@ -233,16 +219,12 @@ function startNew() {
   resetResults();
 }
  
-// ─────────────────────────────────────────
-//   HELPERS
-// ─────────────────────────────────────────
+// HELPERS
 function formatNumber(num) {
   return num.toLocaleString("en-PK");
 }
 
-// ─────────────────────────────────────────
-//   PRINT REPORT
-// ─────────────────────────────────────────
+// PRINT REPORT
 function printReport() {
   if (!window._lastReportData) return;
   const data = window._lastReportData;
