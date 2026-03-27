@@ -148,7 +148,7 @@ def generate_training_data(output_path: str = "data/xgboost_training_data.csv"):
                 "action":         action,
             })
 
-    # SAVE TO CSV
+    # Save to CSV
     output_df = pd.DataFrame(records)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     output_df.to_csv(output_path, index=False)

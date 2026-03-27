@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AutoDamage AI — Intelligent Car Damage Assessment</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  
@@ -35,7 +36,6 @@
       overflow-x: hidden;
     }
  
-    /* ── GRID BG ── */
     body::before {
       content: '';
       position: fixed;
@@ -48,7 +48,6 @@
       z-index: 0;
     }
  
-    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -124,8 +123,7 @@
       color: white !important;
       box-shadow: 0 0 20px rgba(59,130,246,0.3);
     }
- 
-    /* ── HERO ── */
+
     .hero {
       position: relative;
       z-index: 10;
@@ -138,8 +136,7 @@
       padding: 8rem 2rem 4rem;
       overflow: hidden;
     }
- 
-    /* Radial glow */
+
     .hero::after {
       content: '';
       position: absolute;
@@ -251,8 +248,7 @@
       border-color: var(--muted2);
       background: var(--surface);
     }
- 
-    /* ── STATS STRIP ── */
+
     .stats-strip {
       position: relative;
       z-index: 10;
@@ -299,8 +295,7 @@
       from { opacity:0; transform: translateY(-10px); }
       to   { opacity:1; transform: translateY(0); }
     }
- 
-    /* ── SECTION ── */
+
     section {
       position: relative;
       z-index: 10;
@@ -333,8 +328,7 @@
       max-width: 500px;
       line-height: 1.7;
     }
- 
-    /* ── HOW IT WORKS ── */
+
     .steps {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -397,8 +391,7 @@
       color: var(--muted);
       line-height: 1.6;
     }
- 
-    /* ── FEATURES ── */
+
     .features-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -438,6 +431,17 @@
     .fi-orange { background: rgba(251,191,36,0.12);  border: 1px solid rgba(251,191,36,0.2); }
     .fi-red    { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.2); }
     .fi-purple { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2); }
+
+    .feature-icon i {
+      font-size: 1.1rem;
+    }
+
+    .fi-blue i   { color: var(--blue); }
+    .fi-cyan i   { color: var(--cyan); }
+    .fi-green i  { color: var(--green); }
+    .fi-orange i { color: var(--orange); }
+    .fi-red i    { color: var(--red); }
+    .fi-purple i { color: #a78bfa; }
  
     .feature-title {
       font-size: 0.95rem;
@@ -452,8 +456,7 @@
       color: var(--muted);
       line-height: 1.6;
     }
- 
-    /* ── MODELS SECTION ── */
+
     .models-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -518,8 +521,7 @@
       border-radius: 4px;
       letter-spacing: 0.05em;
     }
- 
-    /* ── DEMO SECTION ── */
+
     .demo-section {
       background: var(--bg2);
       border-top: 1px solid var(--border);
@@ -742,8 +744,7 @@
       color: var(--green);
       flex-shrink: 0;
     }
- 
-    /* ── CTA SECTION ── */
+
     .cta-section {
       position: relative;
       z-index: 10;
@@ -778,8 +779,7 @@
       margin: 0 auto 2.5rem;
       line-height: 1.7;
     }
- 
-    /* ── FOOTER ── */
+
     footer {
       border-top: 1px solid var(--border);
       padding: 2rem;
@@ -836,8 +836,7 @@
       font-size: 0.6rem;
       color: var(--muted2);
     }
- 
-    /* ── RESPONSIVE ── */
+
     @media (max-width: 768px) {
       .steps { grid-template-columns: 1fr; }
       .features-grid { grid-template-columns: 1fr; }
@@ -850,11 +849,17 @@
       footer { flex-direction: column; gap: 1rem; text-align: center; }
       .footer-links { flex-wrap: wrap; justify-content: center; }
     }
+
+    .step-icon i {
+      font-size: 1.8rem;
+      color: var(--blue2);
+    }
+
   </style>
 </head>
 <body>
  
-  <!-- NAV -->
+  <!-- nav -->
   <nav>
     <a href="index.html" class="nav-logo">
       <div class="nav-logo-mark">AD</div>
@@ -868,7 +873,7 @@
     </ul>
   </nav>
  
-  <!-- HERO -->
+  <!-- Hero -->
   <div class="hero">
     <div class="hero-badge">
       <div class="hero-badge-dot"></div>
@@ -891,7 +896,7 @@
     </div>
   </div>
  
-  <!-- STATS -->
+  <!-- Stats -->
   <div class="stats-strip">
     <div class="stat-item">
       <div class="stat-num">98<span>.4%</span></div>
@@ -915,7 +920,7 @@
     </div>
   </div>
  
-  <!-- HOW IT WORKS -->
+  <!-- How it works -->
   <section id="how-it-works">
     <div class="section-eyebrow">How It Works</div>
     <div class="section-title">Three steps to a complete<br>damage assessment</div>
@@ -924,26 +929,26 @@
     <div class="steps">
       <div class="step-card">
         <span class="step-num">STEP 01</span>
-        <span class="step-icon">📸</span>
+        <span class="step-icon"><i class="fa-solid fa-image"></i></span>
         <div class="step-title">Upload Your Image</div>
         <div class="step-desc">Drop or select a photo of the damaged vehicle. Supports JPG, PNG, and WEBP up to 10MB. The system validates image quality automatically.</div>
       </div>
       <div class="step-card">
         <span class="step-num">STEP 02</span>
-        <span class="step-icon">🔍</span>
+        <span class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
         <div class="step-title">AI Analysis</div>
         <div class="step-desc">Three YOLOv11 models run in parallel — identifying the car model, segmenting all parts, and detecting every damage type with pixel-level precision.</div>
       </div>
       <div class="step-card">
         <span class="step-num">STEP 03</span>
-        <span class="step-icon">📊</span>
+        <span class="step-icon"><i class="fa-solid fa-chart-bar"></i></span>
         <div class="step-title">Instant Report</div>
         <div class="step-desc">Receive a detailed report with damage types, affected parts, severity levels, repair vs replace recommendations, and PKR cost estimates.</div>
       </div>
     </div>
   </section>
  
-  <!-- DEMO -->
+  <!-- Demo -->
   <div class="demo-section">
     <div class="demo-inner">
       <div class="section-eyebrow">Sample Output</div>
@@ -969,7 +974,7 @@
                 </div>
               </div>
               <div>
-                <div class="dri-cost">14,300–57,200</div>
+                <div class="dri-cost">14,300-57,200</div>
                 <div class="dri-cost-label">PKR</div>
               </div>
             </div>
@@ -983,7 +988,7 @@
                 </div>
               </div>
               <div>
-                <div class="dri-cost">4,500–13,500</div>
+                <div class="dri-cost">4,500-13,500</div>
                 <div class="dri-cost-label">PKR</div>
               </div>
             </div>
@@ -997,7 +1002,7 @@
                 </div>
               </div>
               <div>
-                <div class="dri-cost">28,600–100,100</div>
+                <div class="dri-cost">28,600-100,100</div>
                 <div class="dri-cost-label">PKR</div>
               </div>
             </div>
@@ -1005,19 +1010,19 @@
  
           <div class="demo-total">
             <div class="demo-total-label">Total Estimate</div>
-            <div class="demo-total-amount"><span class="cur">PKR </span>47,400–170,800</div>
+            <div class="demo-total-amount"><span class="cur">PKR </span>47,400-170,800</div>
           </div>
  
           <div class="demo-info-list">
             <div class="demo-info-item">
-              <span class="dii-icon">🚗</span>
+              <span class="dii-icon"><i class="fa-solid fa-car"></i></span>
               <span class="dii-label">Vehicle</span>
               <span class="dii-value">Toyota Corolla 2016 · 94%</span>
             </div>
             <div class="demo-info-item">
-              <span class="dii-icon">🎨</span>
+              <span class="dii-icon"><i class="fa-solid fa-palette"></i></span>
               <span class="dii-label">Paint</span>
-              <span class="dii-value">White (solid) · PKR 3,500–8,000</span>
+              <span class="dii-value">White (solid) · PKR 3,500-8,000</span>
             </div>
           </div>
         </div>
@@ -1027,27 +1032,27 @@
           <p>Every analysis produces a structured report covering all detected damage, matched to specific car parts, with severity grading and actionable repair recommendations.</p>
           <div class="demo-checks">
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               Pixel-level damage segmentation
             </div>
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               Part-specific damage mapping
             </div>
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               Repair vs replace recommendation
             </div>
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               PKR cost range estimation
             </div>
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               Paint color detection & cost
             </div>
             <div class="demo-check">
-              <div class="check-icon">✓</div>
+              <div class="check-icon"><i class="fa-solid fa-check"></i></div>
               Pakistani car model identification
             </div>
           </div>
@@ -1056,58 +1061,53 @@
     </div>
   </div>
  
-  <!-- FEATURES -->
-  <section id="features">
-    <div class="section-eyebrow">Features</div>
-    <div class="section-title">Everything you need for<br>accurate damage assessment</div>
- 
-    <div class="features-grid">
+  <!-- Features -->
+  <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon fi-blue">🎯</div>
+        <div class="feature-icon fi-blue"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <div>
           <div class="feature-title">Damage Detection</div>
           <div class="feature-desc">Detects 6 damage types — dents, scratches, cracks, glass shatter, broken lamps, and flat tires — with confidence scores.</div>
         </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon fi-cyan">🔧</div>
+        <div class="feature-icon fi-cyan"><i class="fa-solid fa-puzzle-piece"></i></div>
         <div>
           <div class="feature-title">Parts Segmentation</div>
           <div class="feature-desc">Identifies 22 car parts and maps each damage to its exact location on the vehicle for precise repair targeting.</div>
         </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon fi-green">🚗</div>
+        <div class="feature-icon fi-green"><i class="fa-solid fa-car"></i></div>
         <div>
           <div class="feature-title">Car Model Recognition</div>
           <div class="feature-desc">Recognizes 23 popular Pakistani car models including Suzuki, Toyota, Honda and Daihatsu variants with 98.4% accuracy.</div>
         </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon fi-orange">💰</div>
+        <div class="feature-icon fi-orange"><i class="fa-solid fa-money-bill-wave"></i></div>
         <div>
           <div class="feature-title">PKR Cost Estimation</div>
           <div class="feature-desc">Provides min-max repair cost ranges in Pakistani Rupees based on damage severity, part type, and repair action.</div>
         </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon fi-red">🎨</div>
+        <div class="feature-icon fi-red"><i class="fa-solid fa-palette"></i></div>
         <div>
           <div class="feature-title">Paint Color Detection</div>
           <div class="feature-desc">Automatically detects paint color and finish type, providing relevant repainting cost estimates.</div>
         </div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon fi-purple">🗺️</div>
+        <div class="feature-icon fi-purple"><i class="fa-solid fa-map"></i></div>
         <div>
           <div class="feature-title">Damage Heatmap</div>
           <div class="feature-desc">Visual top-down car diagram highlighting damaged zones with color-coded severity — green, orange, and red.</div>
         </div>
       </div>
     </div>
-  </section>
  
-  <!-- MODELS -->
+  <!-- Models -->
   <section id="models">
     <div class="section-eyebrow">AI Models</div>
     <div class="section-title">Three specialized models,<br>one unified pipeline</div>
@@ -1137,7 +1137,7 @@
     </div>
   </section>
  
-  <!-- CTA -->
+  <!-- cta -->
   <div class="cta-section">
     <h2>Ready to assess<br>your vehicle?</h2>
     <p>Upload a photo and get a complete AI-powered damage report in seconds. No signup required.</p>
@@ -1146,7 +1146,7 @@
     </a>
   </div>
  
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
     <a href="index.html" class="footer-logo">
       <div class="footer-logo-mark">AD</div>

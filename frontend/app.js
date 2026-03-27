@@ -2,7 +2,7 @@ const API_URL = "http://localhost:8000";
  
 let selectedFile = null;
  
-// FILE INPUT
+// File input
 document.getElementById("file-input").addEventListener("change", function (e) {
   const file = e.target.files[0];
   if (file) handleFileSelected(file);
@@ -27,7 +27,7 @@ uploadZone.addEventListener("drop", (e) => {
   if (file) handleFileSelected(file);
 });
  
-// HANDLE FILE SELECTED
+// Handle file selected
 function handleFileSelected(file) {
   selectedFile = file;
  
@@ -43,7 +43,7 @@ function handleFileSelected(file) {
   resetResults();
 }
  
-// ANALYZE IMAGE
+// Analyze image
 async function analyzeImage() {
   if (!selectedFile) return;
  
@@ -79,7 +79,7 @@ async function analyzeImage() {
   }
 }
  
-// RENDER RESULTS
+// Render results
 function renderResults(data) {
   window._lastReportData = data;
   hideAll();
@@ -177,14 +177,35 @@ function renderResults(data) {
     document.getElementById("paint-container").style.display = "flex";
   }
  
-  // Car model — show with color-coded confidence
+  // Car model — show top 3 predictions
   if (data.car_model) {
-    const name = data.car_model.replace(/_/g, " ");
     const conf = Math.round(data.car_model_confidence * 100);
     const confColor = conf >= 80 ? "#34d399" : conf >= 50 ? "#e3b341" : "#f85149";
-    document.getElementById("car-model-name").textContent = name;
-    document.getElementById("car-model-conf").textContent = `${conf}% confidence`;
-    document.getElementById("car-model-conf").style.color = confColor;
+    
+    // Build top 3 HTML
+    let top3HTML = "";
+    if (data.car_model_top3 && data.car_model_top3.length > 0) {
+      top3HTML = data.car_model_top3.map((pred, i) => {
+        const predPct = Math.round(pred.confidence * 100);
+        const predColor = predPct >= 80 ? "#34d399" : predPct >= 50 ? "#e3b341" : "#f85149";
+        const nameClean = pred.model.replace(/_/g, " ");
+        return `
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.35rem;">
+            <span style="font-size:0.65rem; color:#e6edf3; width:140px; font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${nameClean}</span>
+            <div style="flex:1; height:6px; background:#21262d; border-radius:3px; min-width:60px;">
+              <div style="width:${predPct}%; min-width:${predPct > 0 ? '4px' : '0'}; height:100%; background:${predColor}; border-radius:3px; transition:width 0.5s ease;"></div>
+            </div>
+            <span style="font-size:0.62rem; color:${predColor}; font-family:var(--mono); width:30px; text-align:right;">${predPct}%</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("car-model-name").innerHTML = `
+      <span style="color:#e6edf3; font-size:0.75rem; font-family:var(--mono); letter-spacing:0.06em; text-transform:uppercase; color:#8b949e;">Top Predictions</span>
+    `;
+    document.getElementById("car-model-conf").innerHTML = top3HTML;
+    document.getElementById("car-model-conf").style.color = "";
     document.getElementById("car-model-container").style.display = "flex";
   }
  
@@ -201,14 +222,14 @@ function renderResults(data) {
   document.getElementById("action-footer").style.display = "block";
 }
  
-// SHOW ERROR
+// Show error
 function showError(message) {
   hideAll();
   document.getElementById("error-state").style.display = "block";
   document.getElementById("error-msg").textContent = message;
 }
  
-// HIDE ALL
+// Hide all
 function hideAll() {
   document.getElementById("empty-state").style.display         = "none";
   document.getElementById("error-state").style.display         = "none";
@@ -225,13 +246,13 @@ function hideAll() {
   document.getElementById("action-footer").style.display       = "none";
 }
  
-// RESET
+// Reset
 function resetResults() {
   hideAll();
   document.getElementById("empty-state").style.display = "flex";
 }
  
-// START NEW
+// Start new
 function startNew() {
   selectedFile = null;
   document.getElementById("preview-container").style.display = "none";
@@ -240,12 +261,12 @@ function startNew() {
   resetResults();
 }
  
-// HELPERS
+// Helpers
 function formatNumber(num) {
   return num.toLocaleString("en-PK");
 }
 
-// PRINT REPORT
+// Print report
 function printReport() {
   if (!window._lastReportData) return;
   const data = window._lastReportData;
@@ -266,7 +287,7 @@ function printReport() {
       <td>${dmg.severity_label}</td>
       <td>${dmg.action.toUpperCase()}</td>
       <td>${Math.round(dmg.confidence * 100)}%</td>
-      <td>PKR ${dmg.min_cost.toLocaleString()} – ${dmg.max_cost.toLocaleString()}</td>
+      <td>PKR ${dmg.min_cost.toLocaleString()} - ${dmg.max_cost.toLocaleString()}</td>
     </tr>
   `).join("");
 
@@ -474,7 +495,7 @@ function printReport() {
     <div class="section-title">Cost Summary</div>
     <div class="cost-box">
       <div>
-        <div class="cost-amount"><span class="cur">PKR </span>${data.total_min.toLocaleString()} – ${data.total_max.toLocaleString()}</div>
+        <div class="cost-amount"><span class="cur">PKR </span>${data.total_min.toLocaleString()} - ${data.total_max.toLocaleString()}</div>
         <div class="cost-sub">Estimated total repair cost range</div>
       </div>
       <span class="sev-badge sev-${data.overall_severity}">${data.overall_severity} damage</span>
@@ -512,7 +533,7 @@ function printReport() {
       <div class="info-card">
         <div class="info-card-label">Paint Color</div>
         <div class="info-card-value">${data.paint_color} (${data.paint_code})</div>
-        <div class="info-card-sub">PKR ${data.paint_cost_min?.toLocaleString()} – ${data.paint_cost_max?.toLocaleString()}</div>
+        <div class="info-card-sub">PKR ${data.paint_cost_min?.toLocaleString()} - ${data.paint_cost_max?.toLocaleString()}</div>
       </div>` : ""}
       <div class="info-card">
         <div class="info-card-label">Overall Severity</div>

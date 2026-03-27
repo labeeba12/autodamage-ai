@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AutoDamage AI — Car Damage Estimator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
  
@@ -144,14 +145,12 @@
       50% { opacity:0.4; }
     }
  
-    /* ── PAGE WRAPPER ── */
     .page {
       max-width: 860px;
       margin: 0 auto;
       padding: 5rem 1.5rem 4rem;
     }
  
-    /* ── PAGE TITLE ── */
     .page-title {
       margin-bottom: 2rem;
     }
@@ -198,7 +197,6 @@
  
     .badge strong { color: var(--white); font-weight: 500; }
  
-    /* ── CARD ── */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -232,7 +230,6 @@
       border-radius: 4px;
     }
  
-    /* ── UPLOAD ZONE ── */
     .upload-zone {
       margin: 1.25rem;
       border: 1.5px dashed var(--border);
@@ -327,7 +324,6 @@
  
     #file-input { display: none; }
  
-    /* ── PREVIEW ── */
     .preview-container {
       display: none;
       margin: 1.25rem;
@@ -362,7 +358,6 @@
  
     .preview-btns { display: flex; gap: 0.5rem; }
  
-    /* ── LOADING ── */
     .loading-state {
       display: none;
       flex-direction: column;
@@ -395,7 +390,6 @@
       color: var(--muted2);
     }
  
-    /* ── RESULTS CARD ── */
     .results-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -403,7 +397,6 @@
       overflow: hidden;
     }
  
-    /* ── STATES ── */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -474,7 +467,6 @@
     .no-damage p { font-size: 1rem; font-weight: 600; color: var(--green); }
     .no-damage span { font-family: var(--mono); font-size: 0.62rem; color: var(--muted); }
  
-    /* ── COST BLOCK ── */
     .cost-block {
       display: none;
       padding: 1.5rem 1.25rem 1.25rem;
@@ -525,7 +517,6 @@
     .sev-severe   { background: var(--red-dim);    color: var(--red);    border: 1px solid rgba(248,81,73,0.25); }
     .sev-none     { background: var(--surface2);   color: var(--muted);  border: 1px solid var(--border); }
  
-    /* ── DAMAGE LIST ── */
     .damage-list {
       display: none;
       flex-direction: column;
@@ -599,7 +590,6 @@
       margin-top: 0.1rem;
     }
  
-    /* ── SECTION DIVIDER ── */
     .section-divider {
       padding: 0.6rem 1.25rem;
       border-top: 1px solid var(--border2);
@@ -611,7 +601,6 @@
       background: var(--surface2);
     }
  
-    /* ── IMAGES ROW ── */
     .images-row {
       display: none;
       grid-template-columns: 1fr;
@@ -619,11 +608,12 @@
       padding: 1rem 1.25rem;
     }
  
-    .img-block { display: none; flex-direction: column; gap: 0.4rem;}
+    .img-block { display: none; flex-direction: column; gap: 0.4rem; padding: 0.5rem; background: var(--surface2); border-radius: 8px; }
     .img-block-label { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
-    .img-block img { width: 100%; border-radius: 6px; border: 1px solid var(--border); display: block; }
+    .img-block img { width: auto; max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border); display: block; margin: 0 auto; background: var(--surface2); }
+
+    #before-after-container img { width: 100%; max-height: 280px; object-fit: cover; }
  
-    /* ── INFO ROW ── */
     .info-row {
       display: none;
       border-top: 1px solid var(--border2);
@@ -674,7 +664,6 @@
       flex-shrink: 0;
     }
  
-    /* ── STATS BAR ── */
     .stats-bar {
       display: none;
       border-top: 1px solid var(--border2);
@@ -713,14 +702,12 @@
       text-transform: uppercase;
     }
  
-    /* ── ACTION FOOTER ── */
     #action-footer {
       display: none;
       padding: 1rem 1.25rem;
       border-top: 1px solid var(--border2);
     }
  
-    /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border);
       padding: 1.25rem 1.5rem;
@@ -760,7 +747,7 @@
 </head>
 <body>
  
-  <!-- NAV -->
+  <!-- nav -->
   <nav>
     <a href="index.html" class="nav-logo">
       <div class="nav-logo-mark">AD</div>
@@ -773,16 +760,16 @@
     </ul>
   </nav>
  
-  <!-- PAGE -->
+  <!-- Page -->
   <div class="page">
  
-    <!-- TITLE -->
+    <!-- Title -->
     <div class="page-title">
       <h1>Car Damage Estimator</h1>
       <p>Upload a car photo to detect damage, identify affected parts, and get a repair cost estimate in PKR.</p>
     </div>
  
-    <!-- UPLOAD CARD -->
+    <!-- Upload card -->
     <div class="card">
       <div class="card-head">
         <span class="card-label">Image Input</span>
@@ -826,7 +813,7 @@
       </div>
     </div>
  
-    <!-- RESULTS CARD -->
+    <!-- Results card -->
     <div class="results-card">
       <div class="card-head">
         <span class="card-label">Damage Report</span>
@@ -895,7 +882,7 @@
  
       <!-- Car Model -->
       <div class="info-row" id="car-model-container">
-        <div class="info-icon">🚗</div>
+        <div class="info-icon"><i class="fa-solid fa-car"></i></div>
         <div>
           <div class="info-label">Vehicle Identified</div>
           <div class="info-value" id="car-model-name"></div>
@@ -932,7 +919,7 @@
     </div>
   </div>
  
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
     <div class="footer-text">AutoDamage AI · Final Year Project · 2026</div>
   </footer>
