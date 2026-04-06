@@ -2,9 +2,7 @@ const API_URL = "http://localhost:8000";
 
 let selectedFile = null;
 
-// ─────────────────────────────────────────
-//   FILE INPUT HANDLING
-// ─────────────────────────────────────────
+// File input handling
 document.getElementById("file-input").addEventListener("change", function (e) {
   const file = e.target.files[0];
   if (file) handleFileSelected(file);
@@ -29,9 +27,7 @@ uploadZone.addEventListener("drop", (e) => {
   if (file) handleFileSelected(file);
 });
 
-// ─────────────────────────────────────────
-//   HANDLE FILE SELECTED
-// ─────────────────────────────────────────
+// Handle file selected
 function handleFileSelected(file) {
   selectedFile = file;
 
@@ -49,9 +45,7 @@ function handleFileSelected(file) {
   resetResults();
 }
 
-// ─────────────────────────────────────────
-//   ANALYZE IMAGE — calls FastAPI
-// ─────────────────────────────────────────
+// Analyze image — calls FastAPI
 async function analyzeImage() {
   if (!selectedFile) return;
 
@@ -89,9 +83,7 @@ async function analyzeImage() {
   }
 }
 
-// ─────────────────────────────────────────
-//   RENDER RESULTS
-// ─────────────────────────────────────────
+// Render results
 function renderResults(data) {
   hideAll();
 
@@ -202,9 +194,7 @@ function renderResults(data) {
   document.getElementById("action-footer").style.display = "block";
 }
 
-// ─────────────────────────────────────────
-//   SHOW ERROR
-// ─────────────────────────────────────────
+// Show ERROR
 function showError(message) {
   hideAll();
   const errorState = document.getElementById("error-state");
@@ -212,9 +202,7 @@ function showError(message) {
   document.getElementById("error-msg").textContent = message;
 }
 
-// ─────────────────────────────────────────
-//   HELPERS
-// ─────────────────────────────────────────
+// Helpers
 function hideAll() {
   document.getElementById("empty-state").style.display    = "none";
   document.getElementById("error-state").style.display    = "none";

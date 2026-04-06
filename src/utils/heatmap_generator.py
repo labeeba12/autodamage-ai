@@ -6,8 +6,7 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 # CAR PART ZONES
-# Maps each part name to a region on the top-down car diagram (x, y, w, h)
-# as fractions of diagram size (0.0 - 1.0)
+# Maps each part name to a region on the top-down car diagram (x, y, w, h) as fractions of diagram size (0.0 - 1.0)
 PART_ZONES = {
     # Front sections
     "hood":            (0.30, 0.05, 0.40, 0.20),
@@ -128,14 +127,14 @@ def generate_heatmap(
     Returns: output_path of saved heatmap image
     """
 
-    # CREATE CANVAS
+    # Create canvas
     canvas = np.zeros((DIAGRAM_H, DIAGRAM_W, 3), dtype=np.uint8)
     canvas[:] = (20, 20, 20)  # dark background
 
     # Draw car outline
     canvas = _draw_car_outline(canvas)
 
-    # HIGHLIGHT DAMAGED PARTS
+    # Highlight damaged parts
     damaged_parts = {}
     for item in matched_results:
         part     = item["part_name"].lower()
@@ -168,7 +167,7 @@ def generate_heatmap(
         cv2.addWeighted(overlay, 0.5, canvas, 0.5, 0, canvas)
         cv2.rectangle(canvas, (x1, y1), (x2, y2), color, 2)
 
-    # ADD TITLE AND LEGEND
+    # Add title and legend
     title_bar    = np.zeros((50, DIAGRAM_W, 3), dtype=np.uint8)
     title_bar[:] = (15, 15, 15)
     cv2.putText(

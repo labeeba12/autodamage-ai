@@ -92,24 +92,24 @@ def process_damage_costs(matched_results: list[dict]) -> list[dict]:
         severity_mult    = item["severity_multiplier"]
         area_ratio       = item["area_ratio"]
 
-        # STEP 1: Get base price from CSV
+        # Get base price from CSV
         base_price = price_lookup.get_price(part_name, damage_type)
 
-        # STEP 2: Decide repair or replace
+        # Decide repair or replace
         action = decide_action(
             base_action    = base_price["action"],
             severity_label = severity_label,
             area_ratio     = area_ratio
         )
 
-        # STEP 3: Calculate final cost
+        # Calculate final cost
         final_cost = calculate_final_cost(
             base_price          = base_price,
             severity_multiplier = severity_mult,
             action              = action
         )
 
-        # STEP 4: Add to result
+        # Add to result
         item["action"]   = action
         item["min_cost"] = final_cost["min_cost"]
         item["max_cost"] = final_cost["max_cost"]

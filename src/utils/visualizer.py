@@ -57,7 +57,7 @@ def draw_damage_masks(
             DAMAGE_COLORS["unknown"]
         )
 
-        # Draw Filled Mask
+        # Draw filled mask
         if mask is not None:
             # Resize mask to image size if needed
             if mask.shape != (h, w):
@@ -70,8 +70,7 @@ def draw_damage_masks(
             # Apply colored overlay
             overlay[mask] = color
 
-            # Draw Label
-            # Find centroid of mask for label placement
+            # Draw Label and Find centroid of mask for label placement
             ys, xs     = np.where(mask)
             if len(xs) > 0 and len(ys) > 0:
                 cx = int(np.mean(xs))
@@ -190,7 +189,7 @@ def create_before_after(
 
     h, w = original.shape[:2]
 
-    # CREATE ANNOTATED VERSION
+    # Create annotated version
     annotated = original.copy()
     overlay   = annotated.copy()
 
@@ -244,7 +243,7 @@ def create_before_after(
 
     annotated = cv2.addWeighted(overlay, MASK_ALPHA, annotated, 1 - MASK_ALPHA, 0)
 
-    # ADD LABELS ON TOP OF EACH SIDE
+    # Add labels on top of each side
     label_h = 50
 
     # BEFORE label bar
@@ -270,12 +269,11 @@ def create_before_after(
         severity_color, 2
     )
 
-    # Stack label + image for each side
+    # Stack label and image for each side
     before_col = np.vstack([before_bar, original])
     after_col  = np.vstack([after_bar,  annotated])
 
-    # COMBINE SIDE BY SIDE
-    # Add a thin divider line between the two
+    # Combine side by side and Add a thin divider line between the two
     divider    = np.zeros((before_col.shape[0], 4, 3), dtype=np.uint8)
     divider[:] = (50, 50, 50)
 

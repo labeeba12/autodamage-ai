@@ -51,13 +51,13 @@ def run_pipeline(image_path: str) -> dict:
 
     logger.info(f"Pipeline started for: {image_path}")
     
-    # DETECT PAINT COLOR
+    # Detect paint color
     paint_info     = detect_paint_color(image_path)
     paint_estimator = PaintEstimator()
     paint_cost     = paint_estimator.get_paint_cost(paint_info["paint_code"])
     logger.info(f"Paint detected: {paint_info['color_name']} → {paint_info['paint_code']}")
 
-    # STEP 1: Validate Image
+    # Validate Image
     is_valid, message = validate_image(image_path)
     if not is_valid:
         logger.error(f"Image validation failed: {message}")
@@ -67,10 +67,10 @@ def run_pipeline(image_path: str) -> dict:
         }
     logger.info("Step 1 complete — Image validated")
 
-    # STEP 2: Run Both YOLO Models
+    # Run Both YOLO Models
     parts_detections, damage_detections, classification = segmenter.detect_all(image_path)
     
-    # CAR VALIDATION CHECK
+    # Car validation check
     no_parts   = len(parts_detections) == 0
     no_damage  = len(damage_detections) == 0
     low_conf   = classification["confidence"] < 0.75
@@ -96,7 +96,7 @@ def run_pipeline(image_path: str) -> dict:
             "message":          "No damage detected in this image"
         }
 
-    # STEP 3: Match Damage to Parts
+    # Match Damage to Parts
     matched_results = find_damage_on_parts(
         parts_detections,
         damage_detections
@@ -106,7 +106,7 @@ def run_pipeline(image_path: str) -> dict:
         f"{len(matched_results)} damage-part pairs matched"
     )
 
-    # STEP 4: Calculate Severity
+    # Calculate Severity
     matched_results  = calculate_severity(matched_results)
     overall_severity = get_overall_severity(matched_results)
     logger.info(
@@ -114,7 +114,7 @@ def run_pipeline(image_path: str) -> dict:
         f"Overall severity: {overall_severity.upper()}"
     )
 
-    # STEP 5: Calculate Costs
+    # Calculate Costs
     processed_results = process_damage_costs(matched_results)
     total_cost        = calculate_total_cost(processed_results)
     logger.info(
@@ -124,7 +124,7 @@ def run_pipeline(image_path: str) -> dict:
         f"{total_cost['total_max']:,}"
     )
 
-    # STEP 6: Generate Before/After Image
+    # Generate Before/After Image
     os.makedirs("temp_outputs", exist_ok=True)
     output_filename = f"result_{uuid.uuid4().hex[:8]}.jpg"
     output_path     = os.path.join("temp_outputs", output_filename)
@@ -143,7 +143,7 @@ def run_pipeline(image_path: str) -> dict:
         logger.warning(f"Could not generate before/after image: {e}")
         output_path = None
         
-    # STEP 7: Generate Heatmap
+    # Generate Heatmap
     heatmap_filename = f"heatmap_{uuid.uuid4().hex[:8]}.jpg"
     heatmap_path     = os.path.join("temp_outputs", heatmap_filename)
 
@@ -157,7 +157,7 @@ def run_pipeline(image_path: str) -> dict:
         logger.warning(f"Could not generate heatmap: {e}")
         heatmap_path = None
 
-    # STEP 8: Build Clean Output Report
+    # Build Clean Output Report
     # Remove numpy masks from output (not JSON serializable)
     damages_output = []
     for item in processed_results:

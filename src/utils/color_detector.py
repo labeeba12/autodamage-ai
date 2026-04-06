@@ -5,10 +5,7 @@ from src.utils.logger import get_logger
 logger = get_logger(__name__)
 
 # COLOR DEFINITIONS
-# Each paint color mapped to:
-# - HSV range (hue, saturation, value)
-# - paint_code (matches paint_codes.csv)
-# - display name
+# Each paint color mapped to: HSV range (hue, saturation, value), paint_code (matches paint_codes.csv), display name
 COLOR_PROFILES = [
     {
         "name":       "White",
@@ -110,8 +107,7 @@ def detect_paint_color(image_path: str) -> dict:
 
     h, w = img.shape[:2]
 
-    # FOCUS ON CENTER REGION
-    # Avoids background, sky, road
+    # Focus on center region (Avoids background, sky, road)
     margin_h = int(h * 0.2)
     margin_w = int(w * 0.2)
     center   = img[margin_h:h-margin_h, margin_w:w-margin_w]
@@ -123,7 +119,7 @@ def detect_paint_color(image_path: str) -> dict:
     best_match   = None
     best_count   = 0
 
-    # MATCH AGAINST COLOR PROFILES
+    # Match against color profiles
     color_counts = {}
 
     for profile in COLOR_PROFILES:

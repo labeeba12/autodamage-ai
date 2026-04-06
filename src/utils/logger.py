@@ -25,7 +25,7 @@ def get_logger(name: str) -> logging.Logger:
 
     logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
 
-    # FILE HANDLER — saves logs to file
+    # File handler — saves logs to file
     log_filename = os.path.join(
         LOG_DIR,
         f"{datetime.now().strftime('%Y-%m-%d')}.log"
@@ -37,7 +37,7 @@ def get_logger(name: str) -> logging.Logger:
         datefmt="%Y-%m-%d %H:%M:%S"
     ))
 
-    # CONSOLE HANDLER — prints logs to terminal
+    # Console handler — prints logs to terminal
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(logging.Formatter(
