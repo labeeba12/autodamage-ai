@@ -58,7 +58,7 @@ def validate_image(image_path: str) -> tuple[bool, str]:
         logger.warning(msg)
         return False, msg
 
-    # ALL CHECKS PASSED
+    # All checks passed
     logger.info(f"Image validated — {w}x{h}px | Blur score: {blur_score:.2f}")
     return True, "Image validated successfully"
 
