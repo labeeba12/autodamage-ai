@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from config import LOG_DIR, LOG_LEVEL
 
-# Create logs folder if it doesn't exist
+# Create logs folder 
 os.makedirs(LOG_DIR, exist_ok=True)
 
 
