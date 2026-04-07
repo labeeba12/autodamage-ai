@@ -90,7 +90,7 @@ def find_damage_on_parts(
                 best_overlap = overlap
                 best_match   = part
 
-        # MATCH FOUND
+        # Match found
         if best_match and best_overlap >= overlap_threshold:
             matched_results.append({
                 "damage_type":   damage["class_name"],
@@ -108,7 +108,7 @@ def find_damage_on_parts(
                 f"(overlap: {best_overlap:.2%})"
             )
 
-        # NO MATCH FOUND — use proximity matching as fallback
+        # No match found — use proximity matching as fallback
         else:
             part_name = "Unknown Part"
             part_mask = None
