@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from config import BASELINE_PRICES_PATH
 
-# ENCODING MAPS (must match feature_builder.py)
+# Encoding maps (must match feature_builder.py)
 DAMAGE_TYPE_MAP = {
     "scratch":       0,
     "dent":          1,
@@ -43,8 +43,7 @@ PART_MAP = {
     "windshield":      20, "unknown part":    21
 }
 
-# SEVERITY AREA RANGES
-# Realistic area_ratio ranges per severity
+# Severity area ranges
 SEVERITY_AREA_RANGES = {
     "minor":    (0.001, 0.019),
     "moderate": (0.020, 0.079),
@@ -93,7 +92,7 @@ def generate_training_data(output_path: str = "data/xgboost_training_data.csv"):
 
         for _ in range(SAMPLES_PER_ROW):
 
-            # RANDOMLY ASSIGN SEVERITY
+            # Randomly assign severity
             severity = np.random.choice(
                 ["minor", "moderate", "severe"],
                 p=[0.4, 0.4, 0.2]  # minor most common, severe least
@@ -102,15 +101,15 @@ def generate_training_data(output_path: str = "data/xgboost_training_data.csv"):
             severity_id   = SEVERITY_MAP[severity]
             multiplier    = SEVERITY_MULTIPLIERS[severity]
 
-            # GENERATE REALISTIC AREA RATIO
+            # Generate area ratio
             area_low, area_high = SEVERITY_AREA_RANGES[severity]
             area_ratio = np.random.uniform(area_low, area_high)
 
-            # GENERATE OVERLAP AND CONFIDENCE
+            # Generate overlap and confidence
             overlap_ratio = np.random.uniform(0.50, 1.00)
             confidence    = np.random.uniform(0.40, 0.99)
 
-            # DETERMINE ACTION
+            # Determine action
             if base_action == "replace" or severity == "severe" or area_ratio > 0.35:
                 action    = "replace"
                 action_id = 1
@@ -118,16 +117,14 @@ def generate_training_data(output_path: str = "data/xgboost_training_data.csv"):
                 action    = "repair"
                 action_id = 0
 
-            # CALCULATE REALISTIC COST
-            # Base price × multiplier × random variation
-            # Replace adds 30% premium
+            # Calculate cost: Base price × multiplier × random variation (Replace adds 30% premium)
             base_cost = np.random.uniform(min_price, max_price)
             cost      = base_cost * multiplier
 
             if action == "replace":
                 cost *= 1.3
 
-            # Add ±15% realistic workshop variation
+            # Add ±15% workshop variation
             variation = np.random.uniform(0.85, 1.15)
             cost      = int(cost * variation)
             cost      = max(cost, 500)  # minimum PKR 500
@@ -141,7 +138,6 @@ def generate_training_data(output_path: str = "data/xgboost_training_data.csv"):
                 "overlap_ratio":  round(overlap_ratio, 4),
                 "confidence":     round(confidence,    4),
                 "actual_cost":    cost,
-                # human readable — not used for training
                 "damage_type":    damage_type,
                 "part_name":      part,
                 "severity":       severity,
