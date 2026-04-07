@@ -11,7 +11,7 @@ from sklearn.metrics import mean_absolute_error, r2_score
 
 from scripts.generate_training_data import generate_training_data
 
-# PATHS
+# Paths
 TRAINING_DATA_PATH = "data/xgboost_training_data.csv"
 MODEL_OUTPUT_PATH  = "models/xgboost_cost_model.json"
 
@@ -38,14 +38,14 @@ def train_model():
     5. Save model
     """
 
-    # STEP 1: Generate data if needed
+    # Generate data if needed
     if not os.path.exists(TRAINING_DATA_PATH):
         print("Training data not found — generating now...")
         generate_training_data(TRAINING_DATA_PATH)
     else:
         print(f"Training data found at {TRAINING_DATA_PATH}")
 
-    # STEP 2: Load data
+    # Load data
     print("\nLoading training data...")
     df = pd.read_csv(TRAINING_DATA_PATH)
     print(f"Loaded {len(df)} samples")
@@ -53,7 +53,7 @@ def train_model():
     X = df[FEATURE_COLS].values
     y = df[TARGET_COL].values
 
-    # STEP 3: Train/test split
+    # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size    = 0.2,
@@ -61,7 +61,7 @@ def train_model():
     )
     print(f"Train: {len(X_train)} samples | Test: {len(X_test)} samples")
 
-    # STEP 4: Train XGBoost
+    # Train XGBoost
     print("\nTraining XGBoost model...")
     model = xgb.XGBRegressor(
         n_estimators      = 300,
@@ -83,7 +83,7 @@ def train_model():
         verbose               = 50
     )
 
-    # STEP 5: Evaluate
+    # Evaluate
     print("\nEvaluating model...")
     y_pred = model.predict(X_test)
 
@@ -115,8 +115,7 @@ def train_model():
         bar = "█" * int(imp * 50)
         print(f"  {feat:<20} {bar} {imp:.4f}")
 
-    # STEP 6: Save model
-
+    # Save model
     os.makedirs(os.path.dirname(MODEL_OUTPUT_PATH), exist_ok=True)
     model.save_model(MODEL_OUTPUT_PATH)
     print(f"\nModel saved to: {MODEL_OUTPUT_PATH}")
