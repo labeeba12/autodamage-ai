@@ -5,19 +5,19 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# Color Map
+# Color map
 # Each damage type gets a unique color, Format: BGR (Blue, Green, Red)
 DAMAGE_COLORS = {
-    "scratch":       (0,   255, 255),   # Yellow
-    "dent":          (0,   165, 255),   # Orange
-    "crack":         (0,   0,   255),   # Red
-    "glass shatter": (255, 0,   0  ),   # Blue
-    "lamp broken":   (255, 0,   255),   # Magenta
-    "tire flat":     (0,   255, 0  ),   # Green
-    "unknown":       (128, 128, 128),   # Gray
+    "scratch":       (0,   255, 255),   
+    "dent":          (0,   165, 255),   
+    "crack":         (0,   0,   255),   
+    "glass shatter": (255, 0,   0  ),   
+    "lamp broken":   (255, 0,   255),   
+    "tire flat":     (0,   255, 0  ),  
+    "unknown":       (128, 128, 128),  
 }
 
-PART_COLOR  = (0, 255, 0)    # Green for part outlines
+PART_COLOR  = (0, 255, 0)    
 FONT        = cv2.FONT_HERSHEY_SIMPLEX
 FONT_SCALE  = 0.6
 FONT_THICKNESS = 2
