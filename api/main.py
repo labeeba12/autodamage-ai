@@ -24,8 +24,7 @@ app = FastAPI(
     description = API_DESCRIPTION,
 )
 
-# CORS Middleware
-# Allows frontend to talk to this API
+# CORS Middleware (Allows frontend to talk to this API)
 app.add_middleware(
     CORSMiddleware,
     allow_origins     = ["*"],
@@ -39,9 +38,7 @@ UPLOAD_DIR = "temp_uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-# HEALTH CHECK ENDPOINT
-# GET /health
-# Used to verify API is running
+# Health check endpoint (to verify API is running)
 @app.get("/health", response_model=HealthResponse)
 def health_check():
     logger.info("Health check called")
@@ -52,8 +49,7 @@ def health_check():
     )
 
 
-# ROOT ENDPOINT
-# GET /
+# Root endpoint
 @app.get("/")
 def root():
     return {
@@ -64,9 +60,7 @@ def root():
     }
 
 
-# MAIN ESTIMATION ENDPOINT
-# POST /estimate
-# Upload image → get damage report + cost
+# Main estimation endpoint (Upload image to get damage report and cost)
 @app.post("/estimate", response_model=EstimationResponse)
 async def estimate_damage(file: UploadFile = File(...)):
     """
@@ -78,7 +72,7 @@ async def estimate_damage(file: UploadFile = File(...)):
     - Cost estimate in PKR
     """
 
-    # STEP 1: Validate file type
+    # Validate file type
     allowed_types = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
     if file.content_type not in allowed_types:
         raise HTTPException(
@@ -87,7 +81,7 @@ async def estimate_damage(file: UploadFile = File(...)):
                           f"Please upload JPG, PNG or WEBP image."
         )
 
-    # STEP 2: Save uploaded file temporarily
+    # Save uploaded file temporarily
     unique_filename = f"{uuid.uuid4()}_{file.filename}"
     temp_path       = os.path.join(UPLOAD_DIR, unique_filename)
 
@@ -96,10 +90,10 @@ async def estimate_damage(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         logger.info(f"Image saved temporarily: {temp_path}")
 
-        # STEP 3: Run inference pipeline
+        # Run inference pipeline
         result = run_pipeline(temp_path)
 
-        # STEP 4: Handle pipeline errors
+        # Handle pipeline errors
         if not result["success"]:
             raise HTTPException(
                 status_code = 422,
@@ -120,14 +114,12 @@ async def estimate_damage(file: UploadFile = File(...)):
         )
 
     finally:
-        # STEP 5: Always delete temp file
-        # Even if something crashes above
+        # Always delete temp file
         if os.path.exists(temp_path):
             os.remove(temp_path)
             logger.info(f"Temp file deleted: {temp_path}")
             
-# SERVE RESULT IMAGE
-# GET /result-image/{filename}
+# Serve result image
 @app.get("/result-image/{filename}")
 async def get_result_image(filename: str, background_tasks: BackgroundTasks):
     """
@@ -148,8 +140,7 @@ async def get_result_image(filename: str, background_tasks: BackgroundTasks):
         filename     = filename
     )
     
-# SERVE HEATMAP IMAGE
-# GET /heatmap/{filename}
+# Serve heatmap image
 @app.get("/heatmap/{filename}")
 async def get_heatmap(filename: str, background_tasks: BackgroundTasks):
     """Returns the damage heatmap image."""
@@ -167,7 +158,7 @@ async def get_heatmap(filename: str, background_tasks: BackgroundTasks):
     )
 
 
-# RUN SERVER
+# Run server
 if __name__ == "__main__":
     import uvicorn
     from config import HOST, PORT
