@@ -3,8 +3,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# ENCODING MAPS
-# Convert string labels to numbers for XGBoost input
+# Encoding maps (Convert string labels to numbers for XGBoost input)
 DAMAGE_TYPE_MAP = {
     "scratch":       0,
     "dent":          1,
