@@ -5,7 +5,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# CAR PART ZONES
+# Car part zones
 # Maps each part name to a region on the top-down car diagram (x, y, w, h) as fractions of diagram size (0.0 - 1.0)
 PART_ZONES = {
     # Front sections
@@ -195,7 +195,7 @@ def generate_heatmap(
             0.4, (180, 180, 180), 1
         )
 
-    # Stack title + diagram + legend
+    # Stack title with diagram and legend
     final = np.vstack([title_bar, canvas, legend_bar])
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
