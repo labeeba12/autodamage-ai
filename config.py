@@ -24,7 +24,7 @@ MIN_IMAGE_WIDTH    = 224        # pixels
 MIN_IMAGE_HEIGHT   = 224        # pixels
 BLUR_THRESHOLD     = 50.0       # laplacian variance — below this = too blurry
 
-# SEVERITY THRESHOLDS
+# Severity Thresholds
 # Based on damage area as % of total image
 SEVERITY_THRESHOLDS = {
     "minor":    (0.000, 0.020),   # 0% – 2% of image
@@ -39,7 +39,7 @@ SEVERITY_MULTIPLIERS = {
     "severe":   2.2,
 }
 
-# If damage covers more than this % of a part → replace instead of repair
+# If damage covers more than this % of a part then replace instead of repair
 REPLACE_THRESHOLD = 0.35
 
 # Currency label for output report
