@@ -44,7 +44,7 @@ class EstimationResponse(BaseModel):
 # Returned when something goes wrong
 class ErrorResponse(BaseModel):
     success: bool  = False
-    error:   str              # human readable error message
+    error:   str              
 
 
 #   HEALTH CHECK RESPONSE
