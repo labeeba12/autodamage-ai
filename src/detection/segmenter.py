@@ -29,7 +29,7 @@ class CarSegmenter:
         self.classifier_model = YOLO(CLASSIFIER_MODEL_PATH)
         logger.info("All three models loaded successfully!")
 
-    # INTERNAL HELPER
+    # Internal helper
     def _run_model(self, model: YOLO, image_path: str) -> list[dict]:
         """
         Runs a single YOLO segmentation model on an image.
@@ -96,7 +96,7 @@ class CarSegmenter:
         logger.info(f"{len(detections)} detections found")
         return detections
 
-    # PUBLIC METHODS
+    # Public methods
     def detect_parts(self, image_path: str) -> list[dict]:
         """Runs car parts segmentation model."""
         logger.info("Running car parts detection...")
