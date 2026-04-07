@@ -4,7 +4,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-# COLOR DEFINITIONS
+# Color Definitions
 # Each paint color mapped to: HSV range (hue, saturation, value), paint_code (matches paint_codes.csv), display name
 COLOR_PROFILES = [
     {
