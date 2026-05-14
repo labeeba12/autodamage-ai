@@ -115,7 +115,10 @@ def run_pipeline(image_path: str) -> dict:
     )
 
     # Calculate Costs
-    processed_results = process_damage_costs(matched_results)
+    processed_results = process_damage_costs(
+        matched_results,
+        car_model = classification["predicted_model"]
+    )
     total_cost        = calculate_total_cost(processed_results)
     logger.info(
         f"Step 5 complete — "

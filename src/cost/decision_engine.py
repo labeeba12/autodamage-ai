@@ -11,6 +11,37 @@ logger = get_logger(__name__)
 # Load pricing table once
 price_lookup = PriceLookup()
 
+# Car model price multipliers based on Pakistani market parts pricing
+CAR_PRICE_MULTIPLIERS = {
+    "suzuki_mehran":      0.7,
+    "suzuki_alto":        0.8,
+    "suzuki_cultus":      0.85,
+    "suzuki_swift":       0.9,
+    "suzuki_wagonr":      0.85,
+    "suzuki_highroof":    0.8,
+    "suzuki_kyber":       0.85,
+    "honda_city":         1.0,
+    "honda_civic":        1.2,
+    "toyota_corolla":     1.1,
+    "toyota_vigo":        1.4,
+    "toyota_aqua":        1.3,
+    "toyota_passo":       1.0,
+    "toyota_vitz":        1.0,
+    "toyota_hiace":       1.3,
+    "daihatsu_mira":      0.85,
+    "daihatsu_core":      0.85,
+}
+
+def get_car_multiplier(car_model: str) -> float:
+    """Returns price multiplier based on car model."""
+    if not car_model:
+        return 1.0
+    key = car_model.lower().replace(" ", "_")
+    for k, v in CAR_PRICE_MULTIPLIERS.items():
+        if k in key:
+            return v
+    return 1.0
+
 
 def decide_action(
     base_action:    str,
@@ -45,25 +76,23 @@ def decide_action(
 def calculate_final_cost(
     base_price:          dict,
     severity_multiplier: float,
-    action:              str
+    action:              str,
+    car_model:           str = None
 ) -> dict:
     """
-    Applies severity multiplier to base price.
+    Applies severity multiplier and car model multiplier to base price.
     Replace action adds 30% premium over repair.
-
-    Returns:
-        {
-            "min_cost": int,
-            "max_cost": int,
-        }
     """
-    min_cost = int(base_price["min_price"] * severity_multiplier)
-    max_cost = int(base_price["max_price"] * severity_multiplier)
+    car_mult = get_car_multiplier(car_model)
 
-    # Replace costs more than repair
+    min_cost = int(base_price["min_price"] * severity_multiplier * car_mult)
+    max_cost = int(base_price["max_price"] * severity_multiplier * car_mult)
+
     if action == "replace":
         min_cost = int(min_cost * 1.3)
         max_cost = int(max_cost * 1.3)
+
+    logger.info(f"Car multiplier applied: {car_model} → {car_mult}x")
 
     return {
         "min_cost": min_cost,
@@ -71,7 +100,7 @@ def calculate_final_cost(
     }
 
 
-def process_damage_costs(matched_results: list[dict]) -> list[dict]:
+def process_damage_costs(matched_results: list[dict], car_model: str = None) -> list[dict]:
     """
     Main function — processes all matched damage-part pairs
     and adds cost estimates to each one.
@@ -106,7 +135,8 @@ def process_damage_costs(matched_results: list[dict]) -> list[dict]:
         final_cost = calculate_final_cost(
             base_price          = base_price,
             severity_multiplier = severity_mult,
-            action              = action
+            action              = action,
+            car_model           = car_model
         )
 
         # Add to result
