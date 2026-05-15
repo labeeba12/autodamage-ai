@@ -9,6 +9,8 @@ from src.utils.color_detector import detect_paint_color
 from src.utils.heatmap_generator import generate_heatmap
 from src.cost.paint_estimator import PaintEstimator
 from config import CURRENCY
+from src.logic.feature_builder import build_feature_matrix
+from src.cost.cost_regressor import CostRegressor
 import os
 import uuid
 
@@ -176,6 +178,11 @@ def run_pipeline(image_path: str) -> dict:
             "min_cost":       item["min_cost"],
             "max_cost":       item["max_cost"],
         })
+        
+    # Run AI Prediction 
+    f_matrix = build_feature_matrix(processed_results)
+    regressor = CostRegressor()
+    xg_res = regressor.predict(f_matrix)
 
     logger.info("Pipeline completed successfully")
 
@@ -198,4 +205,6 @@ def run_pipeline(image_path: str) -> dict:
         "car_model":          classification["predicted_model"],
         "car_model_confidence": classification["confidence"],
         "car_model_top3":     classification["top3"],
+        "total_cost_pkr":     xg_res["predicted_cost"] if xg_res else 0,
+        "xgboost_result":     xg_res,
     }
