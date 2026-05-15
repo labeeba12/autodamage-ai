@@ -51,9 +51,10 @@ def build_feature_vector(damage_item: dict) -> np.ndarray:
     damage_type  = DAMAGE_TYPE_MAP.get(
         damage_item["damage_type"].lower(), -1
     )
-    part_name    = PART_MAP.get(
-        damage_item["part_name"].lower(), 21
-    )
+    
+    clean_part_name = damage_item["part_name"].lower().strip().replace(" ", "-")
+    
+    part_name = PART_MAP.get(clean_part_name, 21)
     severity     = SEVERITY_MAP.get(
         damage_item.get("severity_label", "minor").lower(), 0
     )
