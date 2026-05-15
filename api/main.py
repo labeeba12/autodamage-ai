@@ -97,21 +97,9 @@ async def estimate_damage(file: UploadFile = File(...)):
         result = run_pipeline(temp_path)
         
         # Check if prediction is successful
-        # Run inference pipeline
-        result = run_pipeline(temp_path)
-        
         if result.get("success"):
             pred = result.get("total_cost_pkr", 0)
-            
-            logger.info("--- MASTER DEBUG START ---")
-            logger.info(f"1. AI Prediction Value: {pred}")
-            logger.info(f"2. XGBoost Result Dict: {result.get('xgboost_result')}")
-            
-            # Check if features were actually created
-            if "matched_damages" in result:
-                logger.info(f"3. Number of Damages Matched: {len(result['matched_damages'])}")
-            
-            logger.info("--- MASTER DEBUG END ---")
+            logger.info(f"AI Prediction: {pred} PKR")
             
             # For actual cost(testing)
             # MAPE check 
