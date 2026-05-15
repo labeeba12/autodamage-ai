@@ -156,6 +156,41 @@ async def get_heatmap(filename: str, background_tasks: BackgroundTasks):
         media_type = "image/jpeg",
         filename   = filename
     )
+    
+from src.models.cost_regresser import CostRegressor
+
+# Initialize the regressor for evaluation
+regressor = CostRegressor()
+
+@app.post("/evaluate-accuracy")
+async def evaluate_prediction(actual_manual_cost: float, file: UploadFile = File(...)):
+    """
+    Demonstration endpoint: Compares AI prediction with a Manual Manual Price.
+    """
+    # 1. Save and run pipeline (similar to your /estimate logic)
+    unique_filename = f"eval_{uuid.uuid4()}_{file.filename}"
+    temp_path = os.path.join(UPLOAD_DIR, unique_filename)
+    
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    result = run_pipeline(temp_path)
+    os.remove(temp_path) # Clean up
+
+    if result["success"]:
+        predicted_cost = result["total_cost_pkr"]
+        
+        # 2. CALL THE NEW METHOD WE ADDED TO COST_REGRESSER
+        accuracy_report = CostRegressor.calculate_accuracy_metrics(predicted_cost, actual_manual_cost)
+        
+        return {
+            "car_identified": result.get("car_model", "Unknown"),
+            "ai_predicted_cost": predicted_cost,
+            "manual_actual_cost": actual_manual_cost,
+            "error_analysis": accuracy_report
+        }
+    
+    raise HTTPException(status_code=422, detail="Pipeline failed during evaluation")
 
 
 # Run server

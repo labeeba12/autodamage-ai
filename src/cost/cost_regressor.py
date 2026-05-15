@@ -73,6 +73,32 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"XGBoost prediction failed: {e}")
             return None
+        
+        @staticmethod
+    def calculate_accuracy_metrics(predicted_cost: float, actual_cost: float) -> dict:
+        """
+        Calculates MAPE and Absolute Error for the prediction.
+        
+        Args:
+            predicted_cost: The value predicted by XGBoost.
+            actual_cost: The ground truth / manual repair estimate.
+            
+        Returns:
+            Dictionary containing Absolute Error and Percentage Error.
+        """
+        if actual_cost <= 0:
+            return {
+                "absolute_error": abs(predicted_cost - actual_cost),
+                "mape": 100.0  # Avoid division by zero
+            }
+
+        abs_error = abs(predicted_cost - actual_cost)
+        mape = (abs_error / actual_cost) * 100
+
+        return {
+            "absolute_error_pkr": round(abs_error, 2),
+            "error_percentage": round(mape, 2)
+        }
 
     def predict_batch(
         self,
