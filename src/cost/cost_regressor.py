@@ -73,6 +73,18 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"XGBoost prediction failed: {e}")
             return None
+        
+        @staticmethod
+    def calculate_accuracy_metrics(predicted_cost, actual_cost):
+        """
+        Ye function error ko percentage (%) mein badalta hai.
+        """
+        if actual_cost <= 0:
+            return 0.0
+            
+        difference = abs(predicted_cost - actual_cost)
+        mape = (difference / actual_cost) * 100
+        return round(mape, 2)
 
     def predict_batch(
         self,
