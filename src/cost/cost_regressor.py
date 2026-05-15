@@ -39,35 +39,32 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"Failed to load XGBoost model: {e}")
 
-    def predict(self, feature_vector: np.ndarray) -> dict | None:
-        """
-        Predicts repair cost from feature vector.
-
-        Args:
-            feature_vector: numpy array of shape (7,)
-                from feature_builder.py
-
-        Returns:
-            {
-                "predicted_cost": int,
-                "source": "xgboost"
-            }
-            or None if model not available
-        """
+    def predict(self, feature_vector: np.ndarray, actual_cost: float = None) -> dict | None:
         if not self.is_available or self.model is None:
             return None
 
         try:
             # XGBoost expects 2D array
             X = feature_vector.reshape(1, -1)
-            predicted = float(self.model.predict(X)[0])
-            predicted = max(0, int(predicted))
+            
+            # Check Raw prediction 
+            raw_prediction = float(self.model.predict(X)[0])
+            logger.info(f"DEBUG: Raw XGBoost Output -> {raw_prediction}")
 
+            # Calculate Final cost 
+            predicted = max(0, int(raw_prediction))
             logger.info(f"XGBoost prediction: PKR {predicted:,}")
+
+            # MAPE Logic (Accuracy check)
+            mape_value = None
+            if actual_cost is not None:
+                # call function
+                mape_value = self.calculate_accuracy_metrics(predicted, actual_cost)
 
             return {
                 "predicted_cost": predicted,
-                "source":         "xgboost"
+                "source":         "xgboost",
+                "mape_error":     f"{mape_value}%" if mape_value is not None else "N/A"
             }
 
         except Exception as e:
