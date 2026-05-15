@@ -74,7 +74,7 @@ class CostRegressor:
     @staticmethod
     def calculate_accuracy_metrics(predicted_cost, actual_cost):
         """
-        Ye function error ko percentage (%) mein badalta hai.
+        This function converts error to percentage (%) 
         """
         if actual_cost <= 0:
             return 0.0
