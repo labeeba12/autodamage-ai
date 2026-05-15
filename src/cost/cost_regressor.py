@@ -74,7 +74,7 @@ class CostRegressor:
             logger.error(f"XGBoost prediction failed: {e}")
             return None
         
-        @staticmethod
+    @staticmethod
     def calculate_accuracy_metrics(predicted_cost, actual_cost):
         """
         Ye function error ko percentage (%) mein badalta hai.
