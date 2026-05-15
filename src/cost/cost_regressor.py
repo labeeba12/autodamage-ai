@@ -39,38 +39,46 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"Failed to load XGBoost model: {e}")
 
-    def predict(self, feature_vector: np.ndarray, actual_cost: float = None) -> dict | None:
+    def predict(self, feature_matrix: np.ndarray, actual_cost: float = None) -> dict | None:
+        """
+        Iterates through the feature matrix to predict cost for each damage
+        and returns the total sum.
+        """
         if not self.is_available or self.model is None:
             return None
 
         try:
-            # XGBoost expects 2D array
-            X = feature_vector.reshape(1, -1)
+            total_predicted = 0
             
-            # Check Raw prediction 
-            raw_prediction = float(self.model.predict(X)[0])
-            logger.info(f"DEBUG: Raw XGBoost Output -> {raw_prediction}")
+            # Loop through each row in the matrix (each detected damage)
+            # This fixes the "Feature shape mismatch" error
+            for row in feature_matrix:
+                # Reshape single row to (1, 7) for XGBoost
+                X = row.reshape(1, -1)
+                
+                # Get raw prediction for this specific damage
+                raw_val = float(self.model.predict(X)[0])
+                total_predicted += max(0, raw_val)
 
-            # Calculate Final cost 
-            predicted = max(0, int(raw_prediction))
-            logger.info(f"XGBoost prediction: PKR {predicted:,}")
+            final_total = int(total_predicted)
+            logger.info(f"XGBoost Total Prediction: PKR {final_total:,}")
 
-            # MAPE Logic (Accuracy check)
+            # MAPE Logic: Only calculated if actual_cost is provided (e.g., in testing)
             mape_value = None
-            if actual_cost is not None:
-                # call function
-                mape_value = self.calculate_accuracy_metrics(predicted, actual_cost)
+            if actual_cost is not None and actual_cost > 0:
+                mape_value = self.calculate_accuracy_metrics(final_total, actual_cost)
 
             return {
-                "predicted_cost": predicted,
+                "predicted_cost": final_total,
                 "source":         "xgboost",
-                "mape_error":     f"{mape_value}%" if mape_value is not None else "N/A"
+                "mape_error":     f"{mape_value}%" if mape_value is not None else "N/A",
+                "damage_count":   len(feature_matrix)
             }
 
         except Exception as e:
             logger.error(f"XGBoost prediction failed: {e}")
             return None
-        
+                
     @staticmethod
     def calculate_accuracy_metrics(predicted_cost, actual_cost):
         """
