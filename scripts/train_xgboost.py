@@ -61,38 +61,55 @@ def train_model():
     )
     print(f"Train: {len(X_train)} samples | Test: {len(X_test)} samples")
 
+    # Log Transformation
+    y_train_log = np.log1p(y_train)
+    y_test_log = np.log1p(y_test)
+
     # Train XGBoost
     print("\nTraining XGBoost model...")
     model = xgb.XGBRegressor(
-        n_estimators      = 300,
-        max_depth         = 6,
-        learning_rate     = 0.05,
+        n_estimators      = 450,         
+        max_depth         = 5,           
+        learning_rate     = 0.03,        
         subsample         = 0.8,
-        colsample_bytree  = 0.8,
-        min_child_weight  = 3,
-        reg_alpha         = 0.1,
-        reg_lambda        = 1.0,
+        colsample_bytree  = 0.85,
+        min_child_weight  = 2,
+        reg_alpha         = 0.5,         
+        reg_lambda        = 1.5,         
         random_state      = 42,
         n_jobs            = -1,
         verbosity         = 0
     )
 
     model.fit(
-        X_train, y_train,
-        eval_set              = [(X_test, y_test)],
+        X_train, y_train_log,                      
+        eval_set              = [(X_test, y_test_log)],  
         verbose               = 50
     )
 
     # Evaluate
     print("\nEvaluating model...")
-    y_pred = model.predict(X_test)
+    y_pred_log = model.predict(X_test)
+    
+    # Ensure y_pred_log is a valid array
+    if not isinstance(y_pred_log, np.ndarray):
+        raise ValueError("Predicted values (y_pred_log) must be a numpy array.")
+
+    # Convert Log scale to PKR
+    y_pred = np.expm1(y_pred_log)
+    if not isinstance(y_pred, np.ndarray):
+        raise ValueError("Predicted values (y_pred) must be a numpy array.")
 
     mae = mean_absolute_error(y_test, y_pred)
     r2  = r2_score(y_test, y_pred)
+    
+    # Calculate MAPE
+    mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
 
     print(f"\n{'='*40}")
-    print(f"  Mean Absolute Error : PKR {mae:,.0f}")
-    print(f"  R² Score            : {r2:.4f}")
+    print(f"   Mean Absolute Error : PKR {mae:,.0f}")
+    print(f"   Mean Absolute % Error (MAPE): {mape:.2f}%") 
+    print(f"   R² Score            : {r2:.4f}")
     print(f"{'='*40}")
 
     # Sample predictions vs actual

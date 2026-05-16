@@ -39,46 +39,46 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"Failed to load XGBoost model: {e}")
 
-    def predict(self, feature_matrix: np.ndarray, actual_cost: float = None) -> dict | None:
+    def predict(self, feature_matrix):
         """
-        Iterates through the feature matrix to predict cost for each damage
-        and returns the total sum.
+        Predicts total repair cost using the tuned Log-Transformed XGBoost model.
         """
-        if not self.is_available or self.model is None:
-            return None
-
         try:
-            total_predicted = 0
-            
-            # Loop through each row in the matrix (each detected damage)
-            # This fixes the "Feature shape mismatch" error
+            # Validate feature_matrix
+            if not isinstance(feature_matrix, np.ndarray):
+                logger.error("Feature matrix must be a numpy array.")
+                return 0
+
+            # Ensure each row is a valid array
             for row in feature_matrix:
-                # Reshape single row to (1, 7) for XGBoost
+                if not isinstance(row, np.ndarray):
+                    logger.error("Each row in the feature matrix must be a numpy array.")
+                    return 0
+
+            total_predicted = 0
+            import numpy as np
+            
+            if feature_matrix is None or len(feature_matrix) == 0:
+                return 0
+
+            # Loop through each row in the matrix (each detected damage)
+            for row in feature_matrix:
                 X = row.reshape(1, -1)
                 
-                # Get raw prediction for this specific damage
-                raw_val = float(self.model.predict(X)[0])
-                total_predicted += max(0, raw_val)
+                log_prediction = float(self.model.predict(X)[0])
+                
+                actual_pkr = np.expm1(log_prediction)
+                
+                total_predicted += max(0, actual_pkr)
 
             final_total = int(total_predicted)
-            logger.info(f"XGBoost Total Prediction: PKR {final_total:,}")
-
-            # MAPE Logic: Only calculated if actual_cost is provided (e.g., in testing)
-            mape_value = None
-            if actual_cost is not None and actual_cost > 0:
-                mape_value = self.calculate_accuracy_metrics(final_total, actual_cost)
-
-            return {
-                "predicted_cost": final_total,
-                "source":         "xgboost",
-                "mape_error":     f"{mape_value}%" if mape_value is not None else "N/A",
-                "damage_count":   len(feature_matrix)
-            }
+            logger.info(f"XGBoost Total Prediction (Log-Decoded): PKR {final_total:,}")
+            return final_total
 
         except Exception as e:
-            logger.error(f"XGBoost prediction failed: {e}")
-            return None
-                
+            logger.error(f"Error during cost estimation: {str(e)}")
+            return 0
+                        
     @staticmethod
     def calculate_accuracy_metrics(predicted_cost, actual_cost):
         """
