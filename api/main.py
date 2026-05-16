@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import uuid
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -14,6 +15,8 @@ from config import (
     API_VERSION,
     API_DESCRIPTION,
 )
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 logger = get_logger(__name__)
 
@@ -92,6 +95,15 @@ async def estimate_damage(file: UploadFile = File(...)):
 
         # Run inference pipeline
         result = run_pipeline(temp_path)
+        
+        # Check if prediction is successful
+        if result.get("success"):
+            pred = result.get("total_cost_pkr", 0)
+            logger.info(f"AI Prediction: {pred} PKR")
+            
+            # For actual cost(testing)
+            # MAPE check 
+            # result["accuracy_note"] = "Prediction based on XGBoost model"
 
         # Handle pipeline errors
         if not result["success"]:
@@ -156,7 +168,6 @@ async def get_heatmap(filename: str, background_tasks: BackgroundTasks):
         media_type = "image/jpeg",
         filename   = filename
     )
-
 
 # Run server
 if __name__ == "__main__":

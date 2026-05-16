@@ -39,40 +39,57 @@ class CostRegressor:
         except Exception as e:
             logger.error(f"Failed to load XGBoost model: {e}")
 
-    def predict(self, feature_vector: np.ndarray) -> dict | None:
+    def predict(self, feature_matrix):
         """
-        Predicts repair cost from feature vector.
-
-        Args:
-            feature_vector: numpy array of shape (7,)
-                from feature_builder.py
-
-        Returns:
-            {
-                "predicted_cost": int,
-                "source": "xgboost"
-            }
-            or None if model not available
+        Predicts total repair cost using the tuned Log-Transformed XGBoost model.
         """
-        if not self.is_available or self.model is None:
-            return None
-
         try:
-            # XGBoost expects 2D array
-            X = feature_vector.reshape(1, -1)
-            predicted = float(self.model.predict(X)[0])
-            predicted = max(0, int(predicted))
+            # Validate feature_matrix
+            if not isinstance(feature_matrix, np.ndarray):
+                logger.error("Feature matrix must be a numpy array.")
+                return 0
 
-            logger.info(f"XGBoost prediction: PKR {predicted:,}")
+            # Ensure each row is a valid array
+            for row in feature_matrix:
+                if not isinstance(row, np.ndarray):
+                    logger.error("Each row in the feature matrix must be a numpy array.")
+                    return 0
 
-            return {
-                "predicted_cost": predicted,
-                "source":         "xgboost"
-            }
+            total_predicted = 0
+            import numpy as np
+            
+            if feature_matrix is None or len(feature_matrix) == 0:
+                return 0
+
+            # Loop through each row in the matrix (each detected damage)
+            for row in feature_matrix:
+                X = row.reshape(1, -1)
+                
+                log_prediction = float(self.model.predict(X)[0])
+                
+                actual_pkr = np.expm1(log_prediction)
+                
+                total_predicted += max(0, actual_pkr)
+
+            final_total = int(total_predicted)
+            logger.info(f"XGBoost Total Prediction (Log-Decoded): PKR {final_total:,}")
+            return final_total
 
         except Exception as e:
-            logger.error(f"XGBoost prediction failed: {e}")
-            return None
+            logger.error(f"Error during cost estimation: {str(e)}")
+            return 0
+                        
+    @staticmethod
+    def calculate_accuracy_metrics(predicted_cost, actual_cost):
+        """
+        This function converts error to percentage (%) 
+        """
+        if actual_cost <= 0:
+            return 0.0
+            
+        difference = abs(predicted_cost - actual_cost)
+        mape = (difference / actual_cost) * 100
+        return round(mape, 2)
 
     def predict_batch(
         self,

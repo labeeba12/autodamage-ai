@@ -130,8 +130,27 @@ class CarSegmenter:
         predicted_label = class_names[top3_indices[0]]
         main_confidence = round(float(top3_confs[0]), 4)
         
+        # Default status
         is_car = True
-        if main_confidence < 0.5 or predicted_label.lower() in ["background", "not_a_car", "person"]:
+
+        # List of high-priority models from our Pakistani Cars Dataset
+        # We allow these even with lower confidence to improve recall
+        pakistani_cars = ["aqua", "mehran", "corolla", "civic", "vitz", "city", "alto"] 
+        
+        # Check if the current prediction matches any known Pakistani model
+        is_known_model = any(car in predicted_label.lower() for car in pakistani_cars)
+
+        if main_confidence < 0.5:
+            if is_known_model and main_confidence > 0.2:
+                # Bypass strict threshold for recognized car models
+                is_car = True
+                logger.info(f"Low confidence ({main_confidence:.2f}) but matched priority model: {predicted_label}")
+            else:
+                # Maintain strict 0.5 threshold for unknown objects/labels
+                is_car = False
+
+        # Immediate rejection for non-vehicle classes regardless of confidence
+        if predicted_label.lower() in ["background", "not_a_car", "person"]:
             is_car = False
 
         predictions = [
