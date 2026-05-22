@@ -95,8 +95,8 @@ BASE_PRICES = {
 CAR_MODELS = {
     # Budget (cheapest parts, most available)
     "Suzuki_Mehran":        0.65,
-    "Daiatsu_Mira":         0.70,
-    "Daiatsu_Core":         0.72,
+    "Daihatsu_Mira":         0.70,
+    "Daihatsu_Core":         0.72,
     "Suzuki_alto_2007":     0.75,
 
     # Economy
@@ -205,7 +205,6 @@ for car_model, car_mult in CAR_MODELS.items():
                 # Features
                 "car_model":      car_model,
                 "car_model_id":   car_model_id[car_model],
-                "car_multiplier": car_mult,
                 "damage_type":    damage,
                 "damage_type_id": damage_type_id.get(damage, 0),
                 "part_name":      part,
@@ -254,7 +253,6 @@ for _ in range(3000):
     records.append({
         "car_model":      car_model,
         "car_model_id":   car_model_id[car_model],
-        "car_multiplier": car_mult,
         "damage_type":    damage,
         "damage_type_id": damage_type_id.get(damage, 0),
         "part_name":      part,

@@ -21,7 +21,6 @@ MODEL_OUTPUT_PATH  = "models/xgboost_cost_model.json"
 # Features
 FEATURE_COLS = [
     "car_model_id",
-    "car_multiplier",
     "damage_type_id",
     "part_id",
     "severity_id",
@@ -95,7 +94,8 @@ def train_model():
         gamma=0.1,
 
         random_state=42,
-        n_jobs=-1
+        n_jobs=-1,
+        early_stopping_rounds=50
     )
 
     # ---------------------------------------------------------
