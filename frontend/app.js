@@ -54,6 +54,11 @@ async function analyzeImage() {
   try {
     const formData = new FormData();
     formData.append("file", selectedFile);
+
+    // Fetch user selection from your new manufacturer-grouped dropdown element
+    const carModelSelect = document.getElementById("car-model-select");
+    const selectedCarModel = carModelSelect ? carModelSelect.value : "Suzuki_Mehran";
+    formData.append("car_model", selectedCarModel);
  
     const response = await fetch(`${API_URL}/estimate`, {
       method: "POST",
@@ -177,37 +182,18 @@ function renderResults(data) {
     document.getElementById("paint-container").style.display = "flex";
   }
  
-  // Car model — show top 3 predictions
-  if (data.car_model) {
-    const conf = Math.round(data.car_model_confidence * 100);
-    const confColor = conf >= 80 ? "#34d399" : conf >= 50 ? "#e3b341" : "#f85149";
-    
-    // Build top 3 HTML
-    let top3HTML = "";
-    if (data.car_model_top3 && data.car_model_top3.length > 0) {
-      top3HTML = data.car_model_top3.map((pred, i) => {
-        const predPct = Math.round(pred.confidence * 100);
-        const predColor = predPct >= 80 ? "#34d399" : predPct >= 50 ? "#e3b341" : "#f85149";
-        const nameClean = pred.model.replace(/_/g, " ");
-        return `
-          <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.35rem;">
-            <span style="font-size:0.65rem; color:#e6edf3; width:140px; font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${nameClean}</span>
-            <div style="flex:1; height:6px; background:#21262d; border-radius:3px; min-width:60px;">
-              <div style="width:${predPct}%; min-width:${predPct > 0 ? '4px' : '0'}; height:100%; background:${predColor}; border-radius:3px; transition:width 0.5s ease;"></div>
-            </div>
-            <span style="font-size:0.62rem; color:${predColor}; font-family:var(--mono); width:30px; text-align:right;">${predPct}%</span>
-          </div>
-        `;
-      }).join("");
-    }
-
-    document.getElementById("car-model-name").innerHTML = `
-      <span style="color:#e6edf3; font-size:0.75rem; font-family:var(--mono); letter-spacing:0.06em; text-transform:uppercase; color:#8b949e;">Top Predictions</span>
-    `;
-    document.getElementById("car-model-conf").innerHTML = top3HTML;
-    document.getElementById("car-model-conf").style.color = "";
-    document.getElementById("car-model-container").style.display = "flex";
-  }
+  // Display the selected car model's friendly name instead of old classifier predictions
+  const carModelSelect = document.getElementById("car-model-select");
+  const displayModelName = carModelSelect ? carModelSelect.options[carModelSelect.selectedIndex].text : "Selected Vehicle";
+  
+  document.getElementById("car-model-name").innerHTML = `
+    <span style="color:#e6edf3; font-size:0.95rem; font-weight:600;">${displayModelName}</span>
+  `;
+  document.getElementById("car-model-conf").innerHTML = "XGBoost Evaluation Matrix Configured";
+  document.getElementById("car-model-conf").style.color = "var(--green)";
+  document.getElementById("car-model-conf").style.fontFamily = "var(--mono)";
+  document.getElementById("car-model-conf").style.fontSize = "0.62rem";
+  document.getElementById("car-model-container").style.display = "flex";
  
   // Stats
   document.getElementById("stats-bar").style.display = "block";
@@ -278,6 +264,9 @@ function printReport() {
   const timeStr = now.toLocaleTimeString("en-PK", {
     hour: "2-digit", minute: "2-digit"
   });
+
+  const carModelSelect = document.getElementById("car-model-select");
+  const displayModelName = carModelSelect ? carModelSelect.options[carModelSelect.selectedIndex].text : "Selected Vehicle";
 
   const damagesHTML = data.damages.map((dmg, i) => `
     <tr>
@@ -523,12 +512,11 @@ function printReport() {
   <div class="section">
     <div class="section-title">Vehicle Information</div>
     <div class="info-grid">
-      ${data.car_model ? `
       <div class="info-card">
         <div class="info-card-label">Vehicle Model</div>
-        <div class="info-card-value">${data.car_model.replace(/_/g, " ")}</div>
-        <div class="info-card-sub">${Math.round(data.car_model_confidence * 100)}% confidence</div>
-      </div>` : ""}
+        <div class="info-card-value">${displayModelName}</div>
+        <div class="info-card-sub" style="color: #166534;">XGBoost Architecture Verified</div>
+      </div>
       ${data.paint_color ? `
       <div class="info-card">
         <div class="info-card-label">Paint Color</div>

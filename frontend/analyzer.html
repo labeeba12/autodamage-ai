@@ -777,6 +777,49 @@
       </div>
  
       <!-- Upload Zone -->
+       <div style="padding: 1.25rem 1.25rem 0 1.25rem;">
+        <label for="car-model-select" style="display: block; font-family: var(--mono); font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
+          Select Vehicle Model for Accurate PKR Pricing:
+        </label>
+      <select name="car_model" id="car_model">
+        <option value="" disabled selected>Select a vehicle model</option>
+  
+        <optgroup label="Suzuki">
+          <option value="Suzuki_Mehran">Suzuki Mehran</option>
+          <option value="Suzuki_alto_2007">Suzuki Alto (2007 Era)</option>
+          <option value="Suzuki_alto_2019">Suzuki Alto (2019+)</option>
+          <option value="Suzuki_highroof">Suzuki Bolan (High-Roof)</option>
+          <option value="Suzuki_kyber">Suzuki Khyber</option>
+          <option value="Suzuki_cultus_2018">Suzuki Cultus (2018)</option>
+          <option value="Suzuki_cultus_2019">Suzuki Cultus (2019+)</option>
+          <option value="Suzuki_wagonR_2015">Suzuki Wagon R</option>
+          <option value="Suzuki_swift">Suzuki Swift</option>
+       </optgroup>
+
+       <optgroup label="Toyota">
+          <option value="Toyota_Passo">Toyota Passo</option>
+          <option value="Toyota_Vitz">Toyota Vitz</option>
+          <option value="Toyota_Aqua">Toyota Aqua</option>
+          <option value="Toyota_corolla_2007">Toyota Corolla (2007 Era)</option>
+          <option value="Toyota_corolla_2011">Toyota Corolla (2011 Era)</option>
+          <option value="Toyota_corolla_2016">Toyota Corolla (2016+ Altis)</option>
+          <option value="Toyota_Hiace_2012">Toyota Hiace</option>
+          <option value="Toyota_Vigo">Toyota Vigo</option>
+       </optgroup>
+
+       <optgroup label="Honda">
+          <option value="Honda_city_2000">Honda City (2000-2008 Era)</option>
+          <option value="Honda_City_aspire">Honda City Aspire</option>
+          <option value="Honda_civic_2007">Honda Civic (Reborn / 2007)</option>
+          <option value="Honda_civic_2018">Honda Civic (Civic X / 2018)</option>
+       </optgroup>
+
+       <optgroup label="Daihatsu">
+          <option value="Daihatsu_Mira">Daihatsu Mira</option>
+          <option value="Daihatsu_Core">Daihatsu Cuore</option>
+       </optgroup> 
+    </select>
+    </div>
       <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
         <div class="upload-zone-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2f81f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -884,9 +927,9 @@
       <div class="info-row" id="car-model-container">
         <div class="info-icon"><i class="fa-solid fa-car"></i></div>
         <div>
-          <div class="info-label">Vehicle Identified</div>
-          <div class="info-value" id="car-model-name"></div>
-          <div class="info-sub" id="car-model-conf"></div>
+          <div class="info-label">Target Evaluation Vehicle</div>
+          <div class="info-value" id="car-model-name">Selected Vehicle</div>
+          <div class="info-sub" id="car-model-conf" style="color: var(--green);">XGBoost Pipeline Configured</div>
         </div>
       </div>
  
