@@ -556,7 +556,7 @@
       AutoDamage AI addresses a real gap in the Pakistani automotive industry — the lack of fast, objective, and data-driven vehicle damage assessment. Traditional methods rely on manual inspection by workshop staff, which is time-consuming, inconsistent, and prone to human error.
     </p>
     <p class="about-text">
-      Our system uses <strong>three specialized YOLOv11 models</strong> working in a unified pipeline: a parts segmentation model that maps the vehicle structure, a damage detection model that identifies and localizes damage, and a classifier that recognizes the specific car make and model. Together they produce a structured, actionable report in seconds.
+      Our system uses <strong> two specialized YOLOv11 models </strong> working alongside a targeted <strong> XGBoost Regressor</strong> in a unified pipeline: a parts segmentation model that maps the vehicle structure, a damage detection model that identifies and localizes damage, and a localized cost engine that processes the user-selected vehicle profile. Together, they calculate highly accurate, market-specific repair estimates in seconds.
     </p>
 
     <div class="divider"></div>
@@ -576,8 +576,8 @@
         <div class="pipeline-dot"><i class="fa-solid fa-microchip"></i></div>
         <div class="pipeline-content">
           <div class="pipeline-title">Three-Model Inference</div>
-          <div class="pipeline-desc">All three models run on the validated image. The parts model produces segmentation masks for 22 car parts. The damage model detects and segments 6 damage types. The classifier identifies the car make and model.</div>
-          <span class="pipeline-tag">YOLOv11n-seg · YOLOv11m-seg · YOLOv11n-cls</span>
+          <div class="pipeline-desc">All core processing engines execute on the validated image and user input. The parts model produces segmentation masks for 22 car parts, the damage model detects and segments 6 damage types, and the XGBoost cost engine scales the final repair pricing based on the selected vehicle profile.</div>
+          <span class="pipeline-tag">YOLOv11n-seg · YOLOv11m-seg · XGBoost</span>
         </div>
       </div>
       <div class="pipeline-step">
@@ -636,11 +636,11 @@
           <td><span class="acc-value acc-mid">77.7% mAP50</span></td>
         </tr>
         <tr>
-          <td>Car Classifier</td>
-          <td><span class="arch-tag">YOLOv11n-cls</span></td>
-          <td>Image Classification</td>
+          <td>Cost Estimation</td>
+          <td><span class="arch-tag">XGBoost Regressor</span></td>
+          <td>Regression</td>
           <td>23 models</td>
-          <td><span class="acc-value acc-high">98.4% Top-1</span></td>
+          <td><span class="acc-value acc-high">97.6% R² (7.35% MAPE)</span></td>
         </tr>
       </tbody>
     </table>
@@ -651,8 +651,8 @@
     <div class="sec-label">Training Data</div>
     <div class="dataset-grid">
       <div class="dataset-card">
-        <div class="ds-num">1,925<span>+</span></div>
-        <div class="ds-label">Classifier Training Images</div>
+        <div class="ds-num">2,816<span>+</span></div>
+        <div class="ds-label">Damage Training Images</div>
       </div>
       <div class="dataset-card">
         <div class="ds-num">23</div>
@@ -667,8 +667,8 @@
         <div class="ds-label">Damage Types Detected</div>
       </div>
       <div class="dataset-card">
-        <div class="ds-num">51</div>
-        <div class="ds-label">Pricing Table Entries</div>
+        <div class="ds-num">43</div>
+        <div class="ds-label">Passed Pipeline Unit Tests</div>
       </div>
       <div class="dataset-card">
         <div class="ds-num">3</div>

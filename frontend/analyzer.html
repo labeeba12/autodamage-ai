@@ -823,7 +823,7 @@
         <label for="car-model-select" style="display: block; font-family: var(--mono); font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">
           Select Vehicle Model for Accurate PKR Pricing:
         </label>
-      <select name="car_model" id="car_model" class="custom-dropdown">
+      <select name="car_model" id="car_model" class="custom-dropdown" required>
         <option value="" disabled selected>Select a vehicle model</option>
   
         <optgroup label="Suzuki">
@@ -893,10 +893,9 @@
       <!-- Loading -->
       <div class="loading-state" id="loading-state">
         <div class="spinner"></div>
-        <div class="loading-text">ANALYZING DAMAGE...</div>
-        <div class="loading-sub-text">Running YOLOv11 segmentation models</div>
+        <div class="loading-text">PROCESSING PIPELINE...</div>
+        <div class="loading-sub-text">Executing YOLOv11 Instance Detection & XGBoost Engine</div>
       </div>
-    </div>
  
     <!-- Results card -->
     <div class="results-card">
@@ -994,7 +993,7 @@
       </div>
  
       <!-- Action Footer -->
-      <div id="action-footer" style="display:flex; flex-direction:column; gap:0.75rem;">
+      <div id="action-footer" style="display: none; flex-direction:column; gap:0.75rem;">
         <button class="btn btn-blue" onclick="printReport()" style="width:100%; padding:0.7rem;">
           Print / Save Report
         </button>

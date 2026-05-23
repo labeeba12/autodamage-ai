@@ -899,8 +899,8 @@
   <!-- Stats -->
   <div class="stats-strip">
     <div class="stat-item">
-      <div class="stat-num">98<span>.4%</span></div>
-      <div class="stat-desc">Classifier Accuracy</div>
+      <div class="stat-num">97<span>.6%</span></div>
+      <div class="stat-desc">Cost Estimation R²</div>
     </div>
     <div class="stat-item">
       <div class="stat-num">94<span>.5%</span></div>
@@ -937,7 +937,7 @@
         <span class="step-num">STEP 02</span>
         <span class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
         <div class="step-title">AI Analysis</div>
-        <div class="step-desc">Three YOLOv11 models run in parallel — identifying the car model, segmenting all parts, and detecting every damage type with pixel-level precision.</div>
+        <div class="step-desc">Three YOLOv11 models run in parallel — segmenting all car parts, detecting every damage type with pixel-level precision and estimating repair costs.</div>
       </div>
       <div class="step-card">
         <span class="step-num">STEP 03</span>
@@ -1017,7 +1017,7 @@
             <div class="demo-info-item">
               <span class="dii-icon"><i class="fa-solid fa-car"></i></span>
               <span class="dii-label">Vehicle</span>
-              <span class="dii-value">Toyota Corolla 2016 · 94%</span>
+              <span class="dii-value">Toyota Corolla 2016</span>
             </div>
             <div class="demo-info-item">
               <span class="dii-icon"><i class="fa-solid fa-palette"></i></span>
@@ -1053,7 +1053,7 @@
             </div>
             <div class="demo-check">
               <div class="check-icon"><i class="fa-solid fa-check"></i></div>
-              Pakistani car model identification
+              Target market profile evaluation
             </div>
           </div>
         </div>
@@ -1080,8 +1080,8 @@
       <div class="feature-card">
         <div class="feature-icon fi-green"><i class="fa-solid fa-car"></i></div>
         <div>
-          <div class="feature-title">Car Model Recognition</div>
-          <div class="feature-desc">Recognizes 23 popular Pakistani car models including Suzuki, Toyota, Honda and Daihatsu variants with 98.4% accuracy.</div>
+          <div class="feature-title">Target Profile Matching</div>
+          <div class="feature-desc">Maps cost calculations against 23 popular Pakistani car variants across Suzuki, Toyota, Honda, and Daihatsu for targeted local repair estimates.</div>
         </div>
       </div>
       <div class="feature-card">
@@ -1128,11 +1128,11 @@
         <span class="model-arch">YOLOv11m-seg</span>
       </div>
       <div class="model-card">
-        <div class="model-accuracy">98.4%</div>
-        <div class="model-metric">Top-1 Accuracy</div>
-        <div class="model-name">Car Classifier</div>
-        <div class="model-desc">Identifies 23 Pakistani car models from a single image, trained on a custom curated local dataset.</div>
-        <span class="model-arch">YOLOv11n-cls</span>
+        <div class="model-accuracy">97.6%</div>
+        <div class="model-metric">R² Prediction Score</div>
+        <div class="model-name">Cost Estimation Engine</div>
+        <div class="model-desc">Calculates highly localized repair cost estimates (7.35% Avg. Error) using part localization data, severity index, and targeted repair actions.</div>
+        <span class="model-arch">XGBoost Regressor</span>
       </div>
     </div>
   </section>

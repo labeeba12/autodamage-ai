@@ -244,6 +244,26 @@ function startNew() {
   document.getElementById("preview-container").style.display = "none";
   document.getElementById("upload-zone").style.display = "flex";
   document.getElementById("file-input").value = "";
+  
+  const carModelSelect = document.getElementById("car-model-select");
+  if (carModelSelect) {
+    carModelSelect.value = "";             // Clears if it's a text search input
+    carModelSelect.selectedIndex = 0;      // Resets if it's a standard dropdown
+    carModelSelect.dispatchEvent(new Event('change'));
+  }
+
+  const allSearchInputs = document.querySelectorAll('input[type="text"], input[type="search"], select');
+  allSearchInputs.forEach(input => {
+  
+    if (input.id !== "file-input") {
+      input.value = "";
+      if (input.tagName === "SELECT") {
+        input.selectedIndex = 0;
+      }
+      input.dispatchEvent(new Event('change'));
+    }
+  });
+  
   resetResults();
 }
  
