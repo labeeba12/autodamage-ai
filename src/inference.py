@@ -176,7 +176,7 @@ def run_pipeline(image_path: str, user_car_model: str = "corolla") -> dict:
         })
         
     # Run AI Prediction 
-    f_matrix = build_feature_matrix(processed_results)
+    f_matrix = build_feature_matrix(processed_results, user_car_model)
     regressor = CostRegressor()
     xg_res = regressor.predict(f_matrix)
 

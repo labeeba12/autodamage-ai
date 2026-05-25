@@ -38,63 +38,65 @@ PART_MAP = {
     "windshield":     20, "unknown part":   21
 }
 
+CAR_MODEL_MAP = {
+    "mehran":  0,
+    "alto":    1,
+    "vitz":    2,
+    "aqua":    3,
+    "city":    4,
+    "civic":   5,
+    "corolla": 6
+}
 
-def build_feature_vector(damage_item: dict) -> np.ndarray:
+
+def build_feature_vector(damage_item: dict, user_car_model: str) -> np.ndarray:
     """
     Converts a single damage item into a numerical feature vector.
 
-    Input:  single damage dict from matched_results
-    Output: numpy array of shape (7,)
-        [damage_type, part_name, severity, action,
-         area_ratio, overlap_ratio, confidence]
+    Input:  single damage dict from matched_results, user_car_model string
+    Output: numpy array of shape (8,) matching the XGBoost training matrix
     """
-    damage_type  = DAMAGE_TYPE_MAP.get(
-        damage_item["damage_type"].lower(), -1
-    )
+    part_id = PART_MAP.get(damage_item["part_name"].lower().strip().replace(" ", "-"), 21)
+    damage_type_id = DAMAGE_TYPE_MAP.get(damage_item["damage_type"].lower(), -1)
+    car_model_id = CAR_MODEL_MAP.get(user_car_model.lower().strip(), 6)
+    severity_id = SEVERITY_MAP.get(damage_item.get("severity_label", "minor").lower(), 0)
+    action_id = ACTION_MAP.get(damage_item.get("action", "repair").lower(), 0)
     
-    clean_part_name = damage_item["part_name"].lower().strip().replace(" ", "-")
-    
-    part_name = PART_MAP.get(clean_part_name, 21)
-    severity     = SEVERITY_MAP.get(
-        damage_item.get("severity_label", "minor").lower(), 0
-    )
-    action       = ACTION_MAP.get(
-        damage_item.get("action", "repair").lower(), 0
-    )
-    area_ratio   = float(damage_item.get("area_ratio",   0.0))
-    overlap_ratio= float(damage_item.get("overlap_ratio",0.0))
-    confidence   = float(damage_item.get("confidence",   0.0))
+    area_ratio = float(damage_item.get("area_ratio", 0.0))
+    overlap_ratio = float(damage_item.get("overlap_ratio", 0.0))
+    confidence = float(damage_item.get("confidence", 0.0))
 
+    # Arranged precisely to match your XGBoost matrix column structure
     feature_vector = np.array([
-        damage_type,
-        part_name,
-        severity,
-        action,
-        area_ratio,
-        overlap_ratio,
-        confidence
+        part_id,            
+        damage_type_id,     
+        car_model_id,       
+        area_ratio,         
+        severity_id,        
+        overlap_ratio,      
+        action_id,          
+        confidence          
     ], dtype=np.float32)
 
     logger.info(
-        f"Feature vector built for "
-        f"{damage_item['damage_type']} on "
-        f"{damage_item['part_name']}: {feature_vector}"
+        f"Feature vector built for {damage_item['damage_type']} on "
+        f"{damage_item['part_name']} ({user_car_model}): {feature_vector}"
     )
     return feature_vector
 
 
-def build_feature_matrix(matched_results: list[dict]) -> np.ndarray:
+def build_feature_matrix(matched_results: list[dict], user_car_model: str) -> np.ndarray:
     """
     Builds feature matrix for all damage items.
     Each row = one damage item.
 
-    Output: numpy array of shape (n_damages, 7)
+    Output: numpy array of shape (n_damages, 8)
     """
     if not matched_results:
-        return np.empty((0, 7), dtype=np.float32)
+        return np.empty((0, 8), dtype=np.float32)
 
     matrix = np.array([
-        build_feature_vector(item)
+        build_feature_vector(item, user_car_model)
         for item in matched_results
     ])
 

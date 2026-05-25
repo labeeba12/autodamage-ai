@@ -62,9 +62,7 @@ class CostRegressor:
 
             # Loop through each row in the matrix (each detected damage)
             for row in feature_matrix:
-                # Pad with a default 0.0 value at the end to make it 8 features instead of 7
-                padded_row = np.append(row, 0.0) 
-                X = padded_row.reshape(1, -1)
+                X = row.reshape(1, -1)
                 
                 log_prediction = float(self.model.predict(X)[0])
                 
