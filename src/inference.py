@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 segmenter = CarSegmenter()
 
 
-def run_pipeline(image_path: str) -> dict:
+def run_pipeline(image_path: str, user_car_model: str = "corolla") -> dict:
     """
     Main pipeline function.
     Takes an image path and returns a complete damage report.
@@ -69,19 +69,15 @@ def run_pipeline(image_path: str) -> dict:
         }
     logger.info("Step 1 complete — Image validated")
 
-    # Run Both YOLO Models
-    parts_detections, damage_detections, classification = segmenter.detect_all(image_path)
+    # Run Both YOLO Models (Now correctly unpacking 2 elements)
+    parts_detections, damage_detections = segmenter.detect_all(image_path)
     
-    # Car validation check
-    no_parts   = len(parts_detections) == 0
-    no_damage  = len(damage_detections) == 0
-    low_conf   = classification["confidence"] < 0.75
-
-    if no_parts and low_conf:
-        logger.error(f"Not a car — no parts detected and low confidence: {classification['confidence']:.2%}")
+    # Cleaned Car validation check (Using parts detection instead of classifier)
+    if len(parts_detections) == 0:
+        logger.error("Not a car — zero vehicle parts detected by YOLO.")
         return {
             "success": False,
-            "error":   "No vehicle detected in image. Please upload a clear car photo."
+            "error":   "No vehicle components detected. Please upload a clear car photo."
         }
 
     # No damage found — return early
@@ -116,10 +112,10 @@ def run_pipeline(image_path: str) -> dict:
         f"Overall severity: {overall_severity.upper()}"
     )
 
-    # Calculate Costs
+    # Calculate Costs (Using the user's manual selection input)
     processed_results = process_damage_costs(
         matched_results,
-        car_model = classification["predicted_model"]
+        car_model = user_car_model
     )
     total_cost        = calculate_total_cost(processed_results)
     logger.info(
@@ -202,9 +198,9 @@ def run_pipeline(image_path: str) -> dict:
         "paint_cost_min":     paint_cost["min_price"],
         "paint_cost_max":     paint_cost["max_price"],
         "heatmap_path":       heatmap_path,
-        "car_model":          classification["predicted_model"],
-        "car_model_confidence": classification["confidence"],
-        "car_model_top3":     classification["top3"],
+        "car_model":          user_car_model,
+        "car_model_confidence": 1.0,
+        "car_model_top3":     [],
         "total_cost_pkr":     xg_res["predicted_cost"] if xg_res else 0,
         "xgboost_result":     xg_res,
     }

@@ -63,9 +63,14 @@ def root():
     }
 
 
+from fastapi import Form # Make sure Form is imported at the top if it isn't!
+
 # Main estimation endpoint (Upload image to get damage report and cost)
 @app.post("/estimate", response_model=EstimationResponse)
-async def estimate_damage(file: UploadFile = File(...)):
+async def estimate_damage(
+    file: UploadFile = File(...),
+    car_model: str = Form("corolla") # Receives the frontend dropdown selection safely
+):
     """
     Upload a car image to get:
     - Detected damage types
@@ -93,8 +98,8 @@ async def estimate_damage(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
         logger.info(f"Image saved temporarily: {temp_path}")
 
-        # Run inference pipeline
-        result = run_pipeline(temp_path)
+        # Run inference pipeline with the user-selected car model string
+        result = run_pipeline(temp_path, user_car_model=car_model)
         
         # Check if prediction is successful
         if result.get("success"):

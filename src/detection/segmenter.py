@@ -25,8 +25,6 @@ class CarSegmenter:
         self.parts_model      = YOLO(PARTS_MODEL_PATH)
         logger.info("Loading car damage segmentation model...")
         self.damage_model     = YOLO(DAMAGE_MODEL_PATH)
-        logger.info("Loading car classifier model...")
-        self.classifier_model = YOLO(CLASSIFIER_MODEL_PATH)
         logger.info("All three models loaded successfully!")
 
     # Internal helper
@@ -107,77 +105,11 @@ class CarSegmenter:
         logger.info("Running car damage detection...")
         return self._run_model(self.damage_model, image_path)
 
-    def classify_car(self, image_path: str) -> dict:
+    def detect_all(self, image_path: str) -> tuple[list[dict], list[dict]]:
         """
-        Runs car classifier model.
-        Returns top 3 predictions with confidence scores.
+        Runs both segmentation models on the same image.
+        Returns (parts_detections, damage_detections)
         """
-        logger.info("Running car classifier...")
-
-        results = self.classifier_model.predict(
-            source  = image_path,
-            imgsz   = 224,
-            save    = False,
-            verbose = False
-        )
-
-        probs       = results[0].probs
-        class_names = results[0].names
-
-        top3_indices = probs.top5[:3]
-        top3_confs   = probs.top5conf[:3].tolist()
-        
-        predicted_label = class_names[top3_indices[0]]
-        main_confidence = round(float(top3_confs[0]), 4)
-        
-        # Default status
-        is_car = True
-
-        # List of high-priority models from our Pakistani Cars Dataset
-        # We allow these even with lower confidence to improve recall
-        pakistani_cars = ["aqua", "mehran", "corolla", "civic", "vitz", "city", "alto"] 
-        
-        # Check if the current prediction matches any known Pakistani model
-        is_known_model = any(car in predicted_label.lower() for car in pakistani_cars)
-
-        if main_confidence < 0.5:
-            if is_known_model and main_confidence > 0.2:
-                # Bypass strict threshold for recognized car models
-                is_car = True
-                logger.info(f"Low confidence ({main_confidence:.2f}) but matched priority model: {predicted_label}")
-            else:
-                # Maintain strict 0.5 threshold for unknown objects/labels
-                is_car = False
-
-        # Immediate rejection for non-vehicle classes regardless of confidence
-        if predicted_label.lower() in ["background", "not_a_car", "person"]:
-            is_car = False
-
-        predictions = [
-            {
-                "rank":       i + 1,
-                "model":      class_names[idx],
-                "confidence": round(float(conf), 4)
-            }
-            for i, (idx, conf) in enumerate(zip(top3_indices, top3_confs))
-        ]
-
-        result = {
-            "predicted_model": predicted_label,
-            "confidence":      main_confidence,
-            "is_car":          is_car, 
-            "top3":            predictions
-        }
-
-        logger.info(f"Car classified as: {result['predicted_model']} | Is Car: {is_car}")
-        return result
-
-    def detect_all(self, image_path: str) -> tuple[list[dict], list[dict], dict]:
-        """
-        Runs all three models on the same image.
-        Returns (parts_detections, damage_detections, car_classification)
-        """
-        parts          = self.detect_parts(image_path)
-        damage         = self.detect_damage(image_path)
-        classification = self.classify_car(image_path)
-        return parts, damage, classification
+        parts  = self.detect_parts(image_path)
+        damage = self.detect_damage(image_path)
+        return parts, damage
