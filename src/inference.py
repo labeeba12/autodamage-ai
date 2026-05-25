@@ -201,6 +201,6 @@ def run_pipeline(image_path: str, user_car_model: str = "corolla") -> dict:
         "car_model":          user_car_model,
         "car_model_confidence": 1.0,
         "car_model_top3":     [],
-        "total_cost_pkr":     xg_res["predicted_cost"] if xg_res else 0,
-        "xgboost_result":     xg_res,
+        "total_cost_pkr":     xg_res if xg_res else 0,
+        "xgboost_result":     {"predicted_cost": xg_res} if xg_res else None,
     }
