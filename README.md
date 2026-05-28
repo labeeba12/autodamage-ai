@@ -26,7 +26,6 @@ AutoDamage AI analyzes a single car photo, detects damage and affected parts, gr
 | Damage Detection | YOLOv11m-seg | Instance segmentation | 6 types | Detects visible damage regions |
 | Cost Estimation | XGBoost | Regression | N/A | Estimates damage repair/replacement cost |
 
-![XGBoost Cost Engine Feature Importance](src/cost/feature_importance.png)
 
 ---
 
