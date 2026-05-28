@@ -1,30 +1,30 @@
 # AutoDamage AI
 
-> Intelligent car damage detection and repair cost estimation — built for the Pakistani automotive market.
+> Intelligent car damage detection and repair cost estimation for the Pakistani automotive market.
 
-AutoDamage AI uses three fine-tuned YOLOv11 models to automatically detect vehicle damage, identify affected parts, classify the car model, and estimate repair costs in PKR from a single photo.
+AutoDamage AI analyzes a single car photo, detects damage and affected parts, grades severity, and estimates repair cost ranges in PKR using YOLO segmentation and an XGBoost cost engine.
 
 ---
 
 ## Features
 
-- **Damage Detection** — Detects 6 damage types: dent, scratch, crack, glass shatter, lamp broken, tire flat
-- **Parts Segmentation** — Identifies and segments 22 car parts with pixel-level masks
-- **Car Model Recognition** — Recognizes 23 Pakistani car models (Suzuki, Toyota, Honda, Daihatsu)
-- **Cost Estimation** — Repair vs replace recommendation with PKR cost ranges
-- **Paint Detection** — Detects paint color and finish type with repainting cost
-- **Damage Heatmap** — Top-down car diagram showing damaged zones by severity
-- **Print Report** — Generate a professional PDF damage report
+- **Damage detection** — detects 6 damage types: dent, scratch, crack, glass shatter, lamp broken, tire flat
+- **Parts segmentation** — identifies 22 car parts with pixel-level masks
+- **Car model selection** — user selects a Pakistani vehicle model from the frontend dropdown for cost estimation
+- **Cost estimation** — repair vs replace recommendation with PKR cost ranges
+- **Paint detection** — estimates paint color, paint code, and repaint cost range
+- **Damage heatmap** — generates a top-down heatmap image showing damage zones
+- **Visual report** — creates before/after comparison images and returns structured JSON output
 
 ---
 
 ## AI Models
 
-| Model | Architecture | Task | Classes | Performance |
-|-------|-------------|------|---------|-------------|
-| Parts Segmentation | YOLOv11n-seg | Instance Segmentation | 22 parts | **94.47% Mask mAP50** |
-| Damage Detection | YOLOv11m-seg | Instance Segmentation | 6 types | **77.7% Mask mAP50** |
-| Car Classifier | YOLOv11n-cls | Image Classification | 23 models | **98.4% Top-1 Accuracy** |
+| Model | Architecture | Task | Classes | Notes |
+|-------|-------------|------|---------|-------|
+| Parts Segmentation | YOLOv11n-seg | Instance segmentation | 22 parts | Detects vehicle body parts and masks |
+| Damage Detection | YOLOv11m-seg | Instance segmentation | 6 types | Detects visible damage regions |
+| Cost Estimation | XGBoost | Regression | N/A | Estimates damage repair/replacement cost |
 
 ---
 
@@ -32,12 +32,12 @@ AutoDamage AI uses three fine-tuned YOLOv11 models to automatically detect vehic
 
 | Layer | Technology |
 |-------|-----------|
-| AI Models | Ultralytics YOLOv11 |
+| AI Models | Ultralytics YOLOv11 + XGBoost |
 | Backend | FastAPI + Python 3.10 |
 | Image Processing | OpenCV + NumPy |
-| Cost Estimation | XGBoost + Pandas |
+| Cost Estimation | XGBoost + pandas |
 | Frontend | HTML + CSS + JavaScript |
-| Training | Google Colab (T4 GPU) |
+| Environment | Python virtualenv |
 
 ---
 
@@ -50,17 +50,19 @@ autodamage-ai/
 │   └── schemas.py       # Pydantic response models
 ├── src/
 │   ├── detection/
-│   │   ├── segmenter.py     # YOLO inference (all 3 models)
-│   │   └── validator.py     # Image validation
+│   │   ├── segmenter.py     # YOLO segmentation inference
+│   │   └── validator.py     # image validation logic
 │   ├── logic/
-│   │   ├── overlap_engine.py  # Damage-to-part matching (IoU + proximity)
-│   │   └── severity_calc.py   # Severity grading
+│   │   ├── feature_builder.py  # builds XGBoost feature vectors
+│   │   ├── overlap_engine.py   # matches damage to parts
+│   │   └── severity_calc.py    # severity grading
 │   ├── cost/
-│   │   ├── decision_engine.py # Repair vs replace logic
-│   │   ├── paint_estimator.py # Paint cost estimation
-│   │   └── xgboost_regressor.py
+│   │   ├── cost_regressor.py   # loads XGBoost model
+│   │   ├── decision_engine.py  # repair/replace and cost rules
+│   │   ├── paint_estimator.py  # paint cost lookup
+│   │   └── price_lookup.py     # baseline pricing data
 │   └── utils/
-│       ├── visualizer.py      # Before/after image
+│       ├── visualizer.py      # before/after image generator
 │       ├── heatmap_generator.py
 │       ├── color_detector.py
 │       └── logger.py
@@ -69,10 +71,11 @@ autodamage-ai/
 │   ├── analyzer.html      # Main analyzer UI
 │   ├── about.html         # About page
 │   └── app.js             # Frontend logic
-├── models/                # Trained YOLO weights (not in repo)
+├── models/                # Trained weights and saved XGBoost model
 ├── data/
-│   └── baseline_prices.csv  # PKR pricing table (51 entries)
-├── tests/                 # Unit tests (43 passing)
+│   ├── baseline_prices.csv
+│   └── paint_codes.csv
+├── tests/                 # Unit tests
 ├── config.py
 └── requirements.txt
 ```
@@ -88,15 +91,15 @@ autodamage-ai/
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/autodamage-ai.git
-cd autodamage-ai
+dcd autodamage-ai
 ```
 
-### 2. Create virtual environment
+### 2. Create a virtual environment
 ```bash
 python -m venv venv
 source venv/Scripts/activate  # Windows Git Bash
 # or
-source venv/bin/activate       # Mac/Linux
+source venv/bin/activate      # Mac/Linux
 ```
 
 ### 3. Install dependencies
@@ -104,17 +107,17 @@ source venv/bin/activate       # Mac/Linux
 pip install -r requirements.txt
 ```
 
-### 4. Add model weights
-Download trained weights and place in `models/` folder:
+### 4. Add model files
+Download the trained model files and place them into the `models/` folder:
+
 ```
 models/
-├── car_parts_seg.pt      # YOLOv11n-seg — 22 car parts
-├── car_damage_seg.pt     # YOLOv11m-seg — 6 damage types
-├── car_classifier.pt     # YOLOv11n-cls — 23 Pakistani car models
-└── xgboost_cost_model.json
+├── car_parts_seg.pt
+├── car_damage_seg.pt
+├── xgboost_cost_model.json
 ```
 
-> Model weights are not included in the repository due to file size. Contact the team for access.
+> Model files are not included in the repository due to size.
 
 ### 5. Run the API
 ```bash
@@ -122,18 +125,21 @@ python -m api.main
 ```
 
 ### 6. Open the frontend
-Open `frontend/index.html` in your browser, or visit:
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
+Open `frontend/index.html` in your browser, or use `frontend/analyzer.html`.
+
+- API docs: http://localhost:8000/docs
+- Health check: http://localhost:8000/health
 
 ---
 
 ## API Reference
 
 ### `POST /estimate`
-Upload a car image to get a complete damage report.
+Uploads a car image and returns a structured damage report.
 
-**Request**: `multipart/form-data` with `file` field (JPG/PNG/WEBP)
+**Request**: `multipart/form-data` containing:
+- `file`: image JPEG/PNG/WEBP
+- `car_model`: selected model value from the frontend dropdown
 
 **Response**:
 ```json
@@ -151,48 +157,55 @@ Upload a car image to get a complete damage report.
       "severity_label": "severe",
       "action": "replace",
       "confidence": 0.92,
+      "pixel_area": 4521,
+      "area_ratio": 0.032,
+      "overlap_ratio": 0.91,
       "min_cost": 14300,
       "max_cost": 57200
     }
   ],
-  "car_model": "Toyota_corolla_2016",
-  "car_model_confidence": 0.94,
+  "result_image_path": "temp_outputs/result_abcdef12.jpg",
+  "heatmap_path": "temp_outputs/heatmap_abcdef12.jpg",
   "paint_color": "Silver",
   "paint_code": "metallic",
+  "paint_hex": "#C0C0C0",
   "paint_cost_min": 5000,
-  "paint_cost_max": 12000
+  "paint_cost_max": 12000,
+  "car_model": "Toyota_corolla_2016",
+  "car_model_confidence": 1.0,
+  "car_model_top3": []
 }
 ```
 
 ### `GET /health`
-Returns API status.
+Returns API status and version.
 
 ### `GET /result-image/{filename}`
-Returns the before/after comparison image.
+Returns the generated before/after comparison image.
 
 ### `GET /heatmap/{filename}`
-Returns the damage heatmap image.
+Returns the generated damage heatmap image.
 
 ---
 
 ## Pipeline
 
 ```
-Image Upload
+Image upload
     ↓
-Image Validation (resolution + blur check)
+Image validation (resolution + blur check)
     ↓
-3-Model Inference (parts seg + damage seg + classifier)
+2-model inference (parts segmentation + damage segmentation)
     ↓
-Car Validation (confidence + parts check)
+Damage-to-part matching (IoU + proximity fallback)
     ↓
-Overlap Engine (IoU matching + proximity fallback)
+Severity calculation (area-based grading)
     ↓
-Severity Calculation (area-based grading)
+Cost estimation (rule-based + XGBoost regression)
     ↓
-Cost Estimation (XGBoost + rule-based pricing)
+Visualization generation (before/after + heatmap)
     ↓
-Report Generation (heatmap + before/after + JSON)
+JSON damage report output
 ```
 
 ---
@@ -203,41 +216,40 @@ Report Generation (heatmap + before/after + JSON)
 pytest tests/ -v
 ```
 
-All 43 tests pass covering:
-- Severity calculation
-- Decision engine (repair vs replace)
-- Overlap engine (IoU + matching)
-- Image validation
-- Pipeline components
+The suite covers:
+- severity calculation
+- decision engine (repair vs replace)
+- overlap engine (damage-part matching)
+- image validation
+- pipeline components
 
 ---
 
 ## Supported Car Models
 
-23 Pakistani car models including:
+The frontend offers a dropdown for 23 Pakistani models, including:
 
 | Brand | Models |
 |-------|--------|
 | Suzuki | Mehran, Alto 2007, Alto 2019, Cultus 2018, Cultus 2019, Swift, WagonR 2015, Highroof, Kyber |
 | Toyota | Corolla 2007, Corolla 2011, Corolla 2016, Aqua, Vitz, Passo, Hiace 2012, Vigo |
 | Honda | City Aspire, City 2000, Civic 2007, Civic 2018 |
-| Daihatsu | Core, Mira |
+| Daihatsu | Cuore, Mira |
 
 ---
 
 ## Known Limitations
 
-- Parts model performs best on standard front/side/rear views. Angled shots use proximity-based fallback matching.
-- Car classifier trained on 23 Pakistani models — vehicles outside this set will match to the closest known model.
-- Cost estimates are approximations based on baseline pricing data. Actual workshop prices may vary.
+- Car model is selected manually from the frontend dropdown rather than being automatically classified.
+- Parts segmentation works best on standard front/side/rear views; very angled shots may fall back to proximity matching.
+- Cost estimates are approximations based on baseline pricing data and may differ from actual workshop quotes.
 
 ---
 
 ## Team
 
-
-1) Labeeba Munawar
-2) Tehreem Raouf 
+- Labeeba Munawar
+- Tehreem Raouf
 
 ---
 
